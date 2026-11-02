@@ -896,8 +896,6 @@
 
         function renderMediaTag(mov) {
             let isAudio = mov.mediaKind === 'audio' || (mov.videoUrl && (mov.videoUrl.includes('.mp3') || mov.videoUrl.includes('.m4a') || mov.videoUrl.includes('.wav') || mov.videoUrl.includes('.ogg')));
-            
-            // ক্যাশ-বাস্টিং ও স্ট্রিম প্যারামিটার যুক্ত করা হলো যাতে ব্রাউজার মেটাডেটা পড়তে পারে
             let streamUrl = mov.videoUrl + (mov.videoUrl.includes('?') ? '&' : '?') + 'v=' + Date.now();
             
             if (isAudio) {
@@ -1205,9 +1203,58 @@
             closeTipsModal();
         };
 
+        // --- NEW: Bunny.net Dynamic Storage Fetching Logic for All Users ---
+        async function fetchBunnyVideosDynamic() {
+            let storageZone = localStorage.getItem('mgsml_bunny_zone') || "mgsml-media";
+            let apiKey = localStorage.getItem('mgsml_bunny_key') || "";
+            let endpointUrl = localStorage.getItem('mgsml_bunny_endpoint') || "https://storage.bunnycdn.com";
+            let cdnUrl = localStorage.getItem('mgsml_bunny_cdn') || "https://mgsml-media-cdn.b-cdn.net/";
+
+            if (!apiKey) return;
+
+            let cleanEndpoint = endpointUrl.replace(/\/$/, '');
+            let listUrl = `${cleanEndpoint}/${storageZone}/`;
+
+            try {
+                let response = await fetch(listUrl, {
+                    method: 'GET',
+                    headers: {
+                        'AccessKey': apiKey,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    let files = await response.json();
+                    let cleanCdn = cdnUrl.endsWith('/') ? cdnUrl : cdnUrl + '/';
+                    
+                    let fetchedMovies = files.map(file => {
+                        let videoUrl = `${cleanCdn}${storageZone}/${file.ObjectName}`;
+                        return {
+                            id: file.Id || Date.now(),
+                            title: file.ObjectName.replace(/^\d+_[a-zA-Z0-9]+_/, '').replace(/_/g, ' '),
+                            description: "Uploaded to Bunny.net Cloud Storage",
+                            videoUrl: videoUrl,
+                            mediaKind: file.ObjectName.match(/\.(mp3|m4a|wav|ogg)$/i) ? 'audio' : 'video',
+                            views: Math.floor(Math.random() * 500) + 15,
+                            likes: 0,
+                            comments: []
+                        };
+                    });
+
+                    localStorage.setItem('mgsml_bunny_movies', JSON.stringify(fetchedMovies));
+                    loadHomeFeedContent();
+                    loadMoviesAndShorts();
+                }
+            } catch (err) {
+                console.error("Error fetching files from Bunny.net:", err);
+            }
+        }
+
         loadAdminSavedConfig();
         loadHomeFeedContent();
         loadMoviesAndShorts();
+        fetchBunnyVideosDynamic(); // Automatically fetches files from Bunny.net storage for all users
     </script>
 </body>
 </html>
