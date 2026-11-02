@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MGSML Sky Project - Social Club & Video Ecosystem</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#080c14',
+                        cardBg: '#111827',
+                        borderCol: '#1f293d',
+                        neonGreen: '#10b981',
+                        cryptoGold: '#f59e0b',
+                        neonPink: '#ec4899',
+                        cyanNeon: '#06b6d4',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #080c14;
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        ::-webkit-scrollbar { width: 0px; }
+        video, audio {
+            transition: transform 0.3s ease;
+            object-fit: contain;
+            background: #000;
+        }
+        .watermark-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #f59e0b;
+            font-weight: 900;
+            font-size: 9px;
+            padding: 3px 6px;
+            border-radius: 4px;
+            letter-spacing: 1px;
+            z-index: 25;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="pb-24">
+
+    <!-- Top Header Bar -->
+    <header id="mainHeaderBar" class="sticky top-0 z-40 glass-panel border-b border-borderCol px-4 py-3 flex items-center justify-between shadow-xl">
+        <div class="flex items-center space-x-3">
+            <button onclick="openLeftDrawer()" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cardBg to-borderCol border border-neonGreen/40 flex items-center justify-center text-neonGreen text-lg active:scale-95 transition-all shadow-md">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <div class="flex items-center space-x-2.5 cursor-pointer" onclick="switchTab('feed')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-neonGreen via-cyanNeon to-cryptoGold flex items-center justify-center text-darkBg font-black text-xl shadow-lg shadow-neonGreen/20">
+                    <i class="fa-solid fa-cube"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-base font-black tracking-wider bg-gradient-to-r from-neonGreen via-cyanNeon to-cryptoGold bg-clip-text text-transparent leading-tight">
+                        MGSML SKY
+                    </span>
+                    <span class="text-[10px] font-bold text-gray-400 tracking-widest">
+                        SOCIAL CLUB & STUDIO
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+            <button onclick="switchTab('profile')" class="flex items-center space-x-2 bg-cardBg px-3 py-1.5 rounded-full border border-cryptoGold/40 shadow-lg active:scale-95 transition-all">
+                <i class="fa-solid fa-wallet text-cryptoGold animate-pulse"></i>
+                <span class="text-xs font-extrabold text-cryptoGold"><span id="userMGSMLBalance">1250</span> MGSML</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Left Side Drawer Menu -->
+    <div id="leftDrawer" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-[900] hidden flex justify-start">
+        <div class="w-72 bg-[#0c121d] h-full border-r border-borderCol p-5 flex flex-col justify-between shadow-2xl relative overflow-y-auto">
+            <div class="space-y-6">
+                <div class="flex items-center justify-between border-b border-borderCol pb-4">
+                    <h3 class="font-extrabold text-sm text-white flex items-center space-x-2">
+                        <i class="fa-solid fa-gear text-neonGreen"></i>
+                        <span>SYSTEM SETTINGS</span>
+                    </h3>
+                    <button onclick="closeLeftDrawer()" class="text-gray-400 hover:text-white">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <div class="space-y-2.5 text-xs font-bold" id="drawerNavButtons">
+                    <button onclick="switchTab('feed'); closeLeftDrawer();" class="w-full text-left px-3.5 py-3 rounded-xl bg-cardBg border border-borderCol text-gray-200 hover:border-neonGreen flex items-center space-x-3">
+                        <i class="fa-solid fa-house text-neonGreen text-sm"></i>
+                        <span>HOME FEED</span>
+                    </button>
+                    <button onclick="switchTab('live'); closeLeftDrawer();" class="w-full text-left px-3.5 py-3 rounded-xl bg-cardBg border border-borderCol text-gray-200 hover:border-red-500 flex items-center space-x-3">
+                        <i class="fa-solid fa-tower-broadcast text-red-500 text-sm animate-pulse"></i>
+                        <span>LIVE STREAM SUB-PAGE</span>
+                    </button>
+                    <button onclick="switchTab('shorts'); closeLeftDrawer();" class="w-full text-left px-3.5 py-3 rounded-xl bg-cardBg border border-borderCol text-gray-200 hover:border-neonPink flex items-center space-x-3">
+                        <i class="fa-solid fa-clapperboard text-neonPink text-sm"></i>
+                        <span>SHORTS & REELS</span>
+                    </button>
+                    <button onclick="switchTab('movies'); closeLeftDrawer();" class="w-full text-left px-3.5 py-3 rounded-xl bg-cardBg border border-borderCol text-gray-200 hover:border-cryptoGold flex items-center space-x-3">
+                        <i class="fa-solid fa-film text-cryptoGold text-sm"></i>
+                        <span>MOVIES & LONG VIDEOS</span>
+                    </button>
+                    <button onclick="switchTab('karaoke'); closeLeftDrawer();" class="w-full text-left px-3.5 py-3 rounded-xl bg-cardBg border border-borderCol text-gray-200 hover:border-neonPink flex items-center space-x-3">
+                        <i class="fa-solid fa-microphone-lines text-neonPink text-sm"></i>
+                        <span>KARAOKE MUSIC STAGE</span>
+                    </button>
+                    <button onclick="switchTab('create'); closeLeftDrawer();" class="w-full text-left px-3.5 py-3 rounded-xl bg-cardBg border border-borderCol text-gray-200 hover:border-cyanNeon flex items-center space-x-3">
+                        <i class="fa-solid fa-cloud-arrow-up text-cyanNeon text-sm"></i>
+                        <span>CREATE & UPLOAD</span>
+                    </button>
+                    <button onclick="switchTab('profile'); closeLeftDrawer();" class="w-full text-left px-3.5 py-3 rounded-xl bg-cardBg border border-borderCol text-gray-200 hover:border-teal-400 flex items-center space-x-3">
+                        <i class="fa-solid fa-user text-teal-400 text-sm"></i>
+                        <span>CREATOR PROFILE SUB-PAGE</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="pt-4 relative h-10 mt-6">
+                <input type="password" id="secretAdminInput" onkeydown="checkSecretAdminPassword(event)" style="position: absolute; opacity: 0; left: 0; top: 0; width: 100%; height: 100%; z-index: 99; cursor: pointer;" placeholder="">
+            </div>
+        </div>
+        <div class="flex-1" onclick="closeLeftDrawer()"></div>
+    </div>
+
+    <!-- Secret Admin Panel -->
+    <div id="secretAdminModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[1000] hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-xl rounded-3xl p-6 border border-red-500/40 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-borderCol pb-3">
+                <h3 class="text-sm font-black text-white flex items-center space-x-2">
+                    <i class="fa-solid fa-shield-halved text-red-500"></i>
+                    <span>MGSML MASTER ADMIN & CONFIG</span>
+                </h3>
+                <button onclick="closeSecretAdminModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="space-y-6 text-xs font-semibold">
+                <!-- 1. Change Admin Password -->
+                <div class="bg-cardBg p-4 rounded-2xl border border-red-500/40 space-y-3">
+                    <h4 class="font-extrabold text-red-400">1. CHANGE ADMIN PASSWORD</h4>
+                    <div class="space-y-2">
+                        <div>
+                            <label class="block font-bold text-gray-300 mb-1">New Password</label>
+                            <input type="password" id="newAdminPass" placeholder="Enter new password" class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-white">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-gray-300 mb-1">Confirm New Password</label>
+                            <input type="password" id="confirmAdminPass" placeholder="Confirm new password" class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-white">
+                        </div>
+                    </div>
+                    <button onclick="saveNewAdminPassword()" class="py-2 px-4 bg-red-600 text-white font-black rounded-xl text-xs">UPDATE PASSWORD</button>
+                </div>
+
+                <!-- 2. Bunny.net Storage & Stream Config -->
+                <div class="bg-cardBg p-5 rounded-2xl border border-neonGreen/40 space-y-4">
+                    <h4 class="font-extrabold text-neonGreen">2. BUNNY.NET STORAGE & STREAM CONFIG</h4>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-400 mb-1">Storage Zone Name</label>
+                            <input type="text" id="bunnyStorageZone" placeholder="mgsml-media" class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-white text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-400 mb-1">1. Storage Password / Access Key</label>
+                            <input type="password" id="bunnyApiKey" placeholder="Access Key" class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-white text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-400 mb-1">2. Stream Library Key / Video API Key</label>
+                            <input type="password" id="bunnyStreamKey" placeholder="Stream Key" class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-white text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-400 mb-1">3. Storage Endpoint URL</label>
+                            <input type="text" id="bunnyEndpointUrl" placeholder="https://storage.bunnycdn.com" class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-white text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-400 mb-1">4. Pull Zone / CDN URL</label>
+                            <input type="text" id="bunnyCdnUrl" placeholder="https://mgsml-media-cdn.b-cdn.net/" class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-white text-xs">
+                        </div>
+                        <button onclick="saveBunnyConfig()" class="py-2 px-4 bg-neonGreen text-darkBg font-black rounded-xl text-xs">SAVE BUNNY CONFIG</button>
+                    </div>
+                </div>
+
+                <!-- 3. Advert & VAST Player Ads Manager -->
+                <div class="bg-cardBg p-4 rounded-2xl border border-cyanNeon/40 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h4 class="font-extrabold text-cyanNeon">3. ADVERT & VAST PLAYER ADS MANAGER</h4>
+                        <label class="flex items-center space-x-1 cursor-pointer">
+                            <input type="checkbox" id="adStatusToggle" class="accent-cyanNeon w-4 h-4" checked>
+                            <span class="text-[11px] text-cyanNeon font-bold">Active</span>
+                        </label>
+                    </div>
+                    <div class="space-y-2">
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-300 mb-1">Pre-Roll Ad URL</label>
+                            <input type="text" id="preRollAd" placeholder="https://..." class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-white">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-300 mb-1">Mid-Roll Ad URL</label>
+                            <input type="text" id="midRollAd" placeholder="https://..." class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-white">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-300 mb-1">Post-Roll Ad URL</label>
+                            <input type="text" id="postRollAd" placeholder="https://..." class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-white">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Telegram API & Bot Config -->
+                <div class="bg-cardBg p-4 rounded-2xl border border-blue-500/40 space-y-3">
+                    <h4 class="font-extrabold text-blue-400">4. TELEGRAM API & BOT CONFIG</h4>
+                    <div class="space-y-2">
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-300 mb-1">Telegram Bot Token</label>
+                            <input type="text" id="tgBotToken" placeholder="Bot Token" class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-white">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-300 mb-1">Telegram Chat ID</label>
+                            <input type="text" id="tgChatId" placeholder="Chat ID" class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-white">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Master Module GitHub Links -->
+                <div class="space-y-3">
+                    <h4 class="font-extrabold text-cryptoGold border-b border-borderCol pb-1">5. MASTER MODULE GITHUB LINKS</h4>
+                    <div class="space-y-2.5">
+                        <div class="bg-cardBg p-3 rounded-xl border border-borderCol space-y-1.5">
+                            <label class="block text-[11px] font-bold text-neonGreen">Home Feed Link</label>
+                            <div class="flex space-x-2">
+                                <input type="text" id="linkFeed" placeholder="https://github.com/..." class="flex-1 bg-darkBg border border-borderCol rounded-xl px-2.5 py-1.5 text-white">
+                                <button onclick="saveSingleLink('feed')" class="px-2.5 py-1.5 bg-neonGreen text-darkBg font-black rounded-lg text-xs">SAVE</button>
+                                <button onclick="enterSingleLink('feed')" class="px-2.5 py-1.5 bg-cyanNeon text-darkBg font-black rounded-lg text-xs">ENTER</button>
+                            </div>
+                        </div>
+                        <div class="bg-cardBg p-3 rounded-xl border border-borderCol space-y-1.5">
+                            <label class="block text-[11px] font-bold text-neonPink">Shorts & Reels Link</label>
+                            <div class="flex space-x-2">
+                                <input type="text" id="linkShorts" placeholder="https://github.com/..." class="flex-1 bg-darkBg border border-borderCol rounded-xl px-2.5 py-1.5 text-white">
+                                <button onclick="saveSingleLink('shorts')" class="px-2.5 py-1.5 bg-neonPink text-white font-black rounded-lg text-xs">SAVE</button>
+                                <button onclick="enterSingleLink('shorts')" class="px-2.5 py-1.5 bg-cyanNeon text-darkBg font-black rounded-lg text-xs">ENTER</button>
+                            </div>
+                        </div>
+                        <div class="bg-cardBg p-3 rounded-xl border border-borderCol space-y-1.5">
+                            <label class="block text-[11px] font-bold text-cryptoGold">Movies Hub Link</label>
+                            <div class="flex space-x-2">
+                                <input type="text" id="linkMovies" placeholder="https://github.com/..." class="flex-1 bg-darkBg border border-borderCol rounded-xl px-2.5 py-1.5 text-white">
+                                <button onclick="saveSingleLink('movies')" class="px-2.5 py-1.5 bg-cryptoGold text-darkBg font-black rounded-lg text-xs">SAVE</button>
+                                <button onclick="enterSingleLink('movies')" class="px-2.5 py-1.5 bg-cyanNeon text-darkBg font-black rounded-lg text-xs">ENTER</button>
+                            </div>
+                        </div>
+                        <div class="bg-cardBg p-3 rounded-xl border border-borderCol space-y-1.5">
+                            <label class="block text-[11px] font-bold text-neonPink">Karaoke Music Stage Link</label>
+                            <div class="flex space-x-2">
+                                <input type="text" id="linkKaraoke" placeholder="https://github.com/..." class="flex-1 bg-darkBg border border-borderCol rounded-xl px-2.5 py-1.5 text-white">
+                                <button onclick="saveSingleLink('karaoke')" class="px-2.5 py-1.5 bg-neonPink text-white font-black rounded-lg text-xs">SAVE</button>
+                                <button onclick="enterSingleLink('karaoke')" class="px-2.5 py-1.5 bg-cyanNeon text-darkBg font-black rounded-lg text-xs">ENTER</button>
+                            </div>
+                        </div>
+                        <div class="bg-cardBg p-3 rounded-xl border border-borderCol space-y-1.5">
+                            <label class="block text-[11px] font-bold text-teal-400">Creator Profile Studio Link</label>
+                            <div class="flex space-x-2">
+                                <input type="text" id="linkProfile" placeholder="https://github.com/..." class="flex-1 bg-darkBg border border-borderCol rounded-xl px-2.5 py-1.5 text-white">
+                                <button onclick="saveSingleLink('profile')" class="px-2.5 py-1.5 bg-teal-400 text-darkBg font-black rounded-lg text-xs">SAVE</button>
+                                <button onclick="enterSingleLink('profile')" class="px-2.5 py-1.5 bg-cyanNeon text-darkBg font-black rounded-lg text-xs">ENTER</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Movie Watch Time Reward Engine -->
+                <div class="bg-cardBg p-4 rounded-2xl border border-cryptoGold/40 space-y-3">
+                    <h4 class="font-extrabold text-cryptoGold">6. MOVIE WATCH TIME REWARD ENGINE</h4>
+                    <div class="space-y-3 text-xs">
+                        <div class="bg-darkBg p-2.5 rounded-xl border border-borderCol space-y-1.5">
+                            <span class="font-bold text-gray-300 block">Tier 1: 1 Min to 15 Mins</span>
+                            <div class="flex space-x-2">
+                                <input type="number" id="tier1Qty" value="2" class="w-16 bg-cardBg border border-borderCol rounded px-2 py-1 text-white text-center">
+                                <select id="tier1Tok" class="flex-1 bg-cardBg border border-borderCol rounded px-2 py-1 text-white"></select>
+                            </div>
+                        </div>
+                        <div class="bg-darkBg p-2.5 rounded-xl border border-borderCol space-y-1.5">
+                            <span class="font-bold text-gray-300 block">Tier 2: 15 Mins to 1 Hour</span>
+                            <div class="flex space-x-2">
+                                <input type="number" id="tier2Qty" value="5" class="w-16 bg-cardBg border border-borderCol rounded px-2 py-1 text-white text-center">
+                                <select id="tier2Tok" class="flex-1 bg-cardBg border border-borderCol rounded px-2 py-1 text-white"></select>
+                            </div>
+                        </div>
+                        <div class="bg-darkBg p-2.5 rounded-xl border border-borderCol space-y-1.5">
+                            <span class="font-bold text-gray-300 block">Tier 3: 1 Hour to 4+ Hours</span>
+                            <div class="flex space-x-2">
+                                <input type="number" id="tier3Qty" value="10" class="w-16 bg-cardBg border border-borderCol rounded px-2 py-1 text-white text-center">
+                                <select id="tier3Tok" class="flex-1 bg-cardBg border border-borderCol rounded px-2 py-1 text-white"></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. Reward Engine Setup (Like, Comment & Share) -->
+                <div class="bg-cardBg p-4 rounded-2xl border border-neonGreen/40 space-y-3">
+                    <h4 class="font-extrabold text-neonGreen">7. REWARD ENGINE SETUP (Like, Comment & Share)</h4>
+                    <div class="space-y-2 text-xs">
+                        <div class="flex items-center space-x-2 bg-darkBg p-2.5 rounded-xl border border-borderCol">
+                            <span class="w-20 font-bold text-neonGreen">LIKE:</span>
+                            <input type="number" id="rewardLikeQty" value="10" class="w-20 bg-cardBg border border-borderCol rounded px-2 py-1 text-white text-center">
+                            <select id="rewardLikeTok" class="flex-1 bg-cardBg border border-borderCol rounded px-2 py-1 text-white"></select>
+                        </div>
+                        <div class="flex items-center space-x-2 bg-darkBg p-2.5 rounded-xl border border-borderCol">
+                            <span class="w-20 font-bold text-neonPink">COMMENT:</span>
+                            <input type="number" id="rewardCommentQty" value="15" class="w-20 bg-cardBg border border-borderCol rounded px-2 py-1 text-white text-center">
+                            <select id="rewardCommentTok" class="flex-1 bg-cardBg border border-borderCol rounded px-2 py-1 text-white"></select>
+                        </div>
+                        <div class="flex items-center space-x-2 bg-darkBg p-2.5 rounded-xl border border-borderCol">
+                            <span class="w-20 font-bold text-cyanNeon">SHARE:</span>
+                            <input type="number" id="rewardShareQty" value="25" class="w-20 bg-cardBg border border-borderCol rounded px-2 py-1 text-white text-center">
+                            <select id="rewardShareTok" class="flex-1 bg-cardBg border border-borderCol rounded px-2 py-1 text-white"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. Tips Coins Manager (19 Tokens) -->
+                <div class="bg-cardBg p-4 rounded-2xl border border-cryptoGold/40 space-y-3">
+                    <h4 class="font-extrabold text-cryptoGold">8. TIPS COINS MANAGER (19 TOKENS)</h4>
+                    <div id="adminTipsCoinsCheckboxes" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1"></div>
+                </div>
+
+                <button onclick="saveAdminMasterConfig()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 text-white font-black shadow-xl">
+                    SAVE & SYNC MASTER CONFIGURATION 🚀
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav id="topNavTabs" class="flex space-x-2 px-4 py-3 overflow-x-auto bg-darkBg/90 sticky top-[61px] z-30 border-b border-borderCol/60">
+        <button onclick="switchTab('feed')" id="btn-feed" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-extrabold whitespace-nowrap bg-neonGreen text-darkBg shadow-lg shadow-neonGreen/20">
+            <i class="fa-solid fa-globe mr-1.5"></i> FEED
+        </button>
+        <button onclick="switchTab('live')" id="btn-live" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-extrabold whitespace-nowrap bg-cardBg text-gray-400 border border-borderCol">
+            <i class="fa-solid fa-tower-broadcast mr-1.5 text-red-500"></i> LIVE STREAM
+        </button>
+        <button onclick="switchTab('shorts')" id="btn-shorts" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-extrabold whitespace-nowrap bg-cardBg text-gray-400 border border-borderCol">
+            <i class="fa-solid fa-clapperboard mr-1.5 text-neonPink"></i> SHORTS
+        </button>
+        <button onclick="switchTab('movies')" id="btn-movies" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-extrabold whitespace-nowrap bg-cardBg text-gray-400 border border-borderCol">
+            <i class="fa-solid fa-film mr-1.5 text-cryptoGold"></i> MOVIES
+        </button>
+        <button onclick="switchTab('karaoke')" id="btn-karaoke" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-extrabold whitespace-nowrap bg-cardBg text-gray-400 border border-borderCol">
+            <i class="fa-solid fa-microphone-lines mr-1.5 text-neonPink"></i> KARAOKE
+        </button>
+        <button onclick="switchTab('create')" id="btn-create" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-extrabold whitespace-nowrap bg-cardBg text-gray-400 border border-borderCol">
+            <i class="fa-solid fa-cloud-arrow-up mr-1.5 text-cyanNeon"></i> CREATE
+        </button>
+        <button onclick="switchTab('profile')" id="btn-profile" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-extrabold whitespace-nowrap bg-cardBg text-gray-400 border border-borderCol">
+            <i class="fa-solid fa-user-gear mr-1.5 text-teal-400"></i> PROFILE
+        </button>
+    </nav>
+
+    <!-- Main Content Containers -->
+    <main class="max-w-xl mx-auto px-4 mt-4" id="mainContainersHolder">
+
+        <!-- 1. Home Feed Section -->
+        <div id="section-feed" class="space-y-4">
+            <div onclick="switchTab('live')" class="glass-panel rounded-2xl p-4 border border-red-500/40 shadow-xl flex items-center justify-between cursor-pointer bg-gradient-to-r from-red-950/40 via-cardBg to-cardBg">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 rounded-xl bg-red-600/20 border border-red-500/50 flex items-center justify-center text-red-500 text-xl shadow-lg animate-pulse">
+                        <i class="fa-solid fa-tower-broadcast"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-black text-white flex items-center space-x-2">
+                            <span>MGSML LIVE STREAMS</span>
+                            <span class="bg-red-600 text-white text-[9px] px-1.5 py-0.5 rounded uppercase font-extrabold">LIVE</span>
+                        </h4>
+                        <p class="text-xs text-gray-400">Broadcast live, chat and send crypto tips!</p>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right text-gray-400"></i>
+            </div>
+
+            <section class="glass-panel rounded-2xl p-4 shadow-xl space-y-3 border border-borderCol">
+                <div class="flex items-center space-x-3">
+                    <img id="creatorAvatarImg" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces" class="w-11 h-11 rounded-full object-cover border-2 border-neonGreen/50 flex-shrink-0">
+                    <span class="text-xs font-bold text-gray-300">Create Social Post</span>
+                </div>
+                <textarea id="socialPostText" rows="2" placeholder="What's on your mind?..." class="w-full bg-darkBg border border-borderCol rounded-xl p-3 text-xs text-white focus:outline-none focus:border-neonGreen resize-none font-bold"></textarea>
+                <div class="flex items-center justify-between pt-1">
+                    <label class="cursor-pointer bg-cardBg border border-borderCol px-3 py-1.5 rounded-xl text-[11px] font-bold text-cyanNeon hover:bg-borderCol transition">
+                        <i class="fa-solid fa-image mr-1"></i> Add Media
+                        <input type="file" id="socialPostMediaFile" accept="image/*,video/*,audio/*" class="hidden" onchange="previewSocialMedia(this)">
+                    </label>
+                    <button type="button" onclick="publishSocialPost()" class="px-4 py-1.5 bg-neonGreen text-darkBg font-black rounded-xl text-xs shadow-md active:scale-95 transition-all">
+                        POST 🚀
+                    </button>
+                </div>
+                <div id="socialMediaPreviewContainer" class="hidden relative rounded-xl overflow-hidden mt-2 max-h-40">
+                    <img id="socialPreviewImg" class="w-full object-cover max-h-40 rounded-xl hidden">
+                    <video id="socialPreviewVid" class="w-full object-cover max-h-40 rounded-xl hidden" controls playsinline preload="metadata" crossorigin="anonymous"></video>
+                </div>
+            </section>
+            
+            <div id="manualPostsContainer" class="space-y-4"></div>
+        </div>
+
+        <!-- 2. Live Stream Sub-Page -->
+        <div id="section-live" class="hidden space-y-4">
+            <div class="py-2 flex items-center justify-between">
+                <button onclick="switchTab('feed')" class="px-3 py-1.5 bg-cardBg border border-borderCol rounded-xl text-xs font-bold text-gray-300 hover:text-white flex items-center space-x-1.5 active:scale-95 transition">
+                    <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
+                </button>
+                <h3 class="text-lg font-black text-cyanNeon tracking-wider">LIVE STREAM</h3>
+            </div>
+            <div class="glass-panel rounded-3xl p-5 border border-borderCol shadow-2xl space-y-6">
+                <div class="text-center py-16 space-y-3">
+                    <i class="fa-solid fa-tower-broadcast text-red-500 text-5xl animate-bounce"></i>
+                    <p class="text-xs text-gray-400 font-bold">Live Stream Sub-Page Loaded Successfully</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Create Module -->
+        <div id="section-create" class="hidden space-y-4">
+            <div class="glass-panel rounded-3xl p-5 border border-cyanNeon/30 shadow-2xl space-y-5">
+                <div class="text-center border-b border-borderCol pb-3">
+                    <h3 class="text-sm font-black text-white flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-cloud-arrow-up text-cyanNeon"></i>
+                        <span>MGSML SKY CREATOR STUDIO (BUNNY.NET)</span>
+                    </h3>
+                    <p class="text-[11px] font-bold text-gray-400 mt-1">Upload directly to Bunny.net Cloud storage!</p>
+                </div>
+
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 mb-1">Video / Audio Title</label>
+                        <input type="text" id="directVideoTitle" placeholder="Enter title..." class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-xs text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 mb-1">Description / Details</label>
+                        <textarea id="directVideoDesc" rows="2" placeholder="Write description..." class="w-full bg-darkBg border border-borderCol rounded-xl p-3 text-xs text-white resize-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 mb-1">Select Video / Audio File (.mp4, .mp3, .m4a)</label>
+                        <input type="file" id="directVideoFile" accept="video/*,audio/*" class="w-full bg-darkBg border border-borderCol rounded-xl p-2 text-xs text-gray-300 mb-2">
+                    </div>
+
+                    <div id="uploadProgressWrapper" class="hidden space-y-2 bg-darkBg p-3 rounded-2xl border border-borderCol">
+                        <div class="flex justify-between text-xs font-extrabold">
+                            <span id="uploadStatusText" class="text-cyanNeon">Uploading to Bunny.net Cloud...</span>
+                            <span id="uploadPercentage" class="text-neonGreen">0%</span>
+                        </div>
+                        <div class="w-full bg-cardBg rounded-full h-3 overflow-hidden border border-borderCol">
+                            <div id="uploadProgressBar" class="bg-gradient-to-r from-neonGreen to-cyanNeon h-full w-0 transition-all duration-200"></div>
+                        </div>
+                    </div>
+
+                    <button type="button" id="uploadBtnElement" onclick="handleBunnyCloudUpload()" class="w-full py-3 bg-gradient-to-r from-neonGreen to-cyanNeon text-darkBg font-black rounded-xl text-xs shadow-lg">
+                        UPLOAD TO BUNNY.NET CLOUD 🚀
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Creator Profile Sub-Page -->
+        <div id="section-profile" class="hidden space-y-4">
+            <div class="py-2 flex items-center justify-between">
+                <button onclick="switchTab('feed')" class="px-3 py-1.5 bg-cardBg border border-borderCol rounded-xl text-xs font-bold text-gray-300 hover:text-white flex items-center space-x-1.5 active:scale-95 transition">
+                    <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
+                </button>
+                <h3 class="text-lg font-black text-cyanNeon tracking-wider">PROFILE</h3>
+            </div>
+            <div class="glass-panel rounded-3xl p-6 border border-teal-400/30 shadow-2xl space-y-6">
+                <div class="text-center py-10 space-y-4">
+                    <div class="w-24 h-24 mx-auto">
+                        <img id="userProfileAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=faces" class="w-24 h-24 rounded-full border-2 border-teal-400 object-cover shadow-xl">
+                    </div>
+                    <div>
+                        <h3 class="text-base font-black text-white">MGSML Creator Studio</h3>
+                        <p class="text-xs text-teal-400 font-bold mt-1">Profile Sub-Page Active</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Shorts & Reels Section -->
+        <div id="section-shorts" class="hidden space-y-4">
+            <div class="flex items-center justify-between glass-panel p-3.5 rounded-2xl border border-neonPink/30 shadow-lg">
+                <div class="flex items-center space-x-2.5">
+                    <i class="fa-solid fa-compact-disc text-neonPink text-lg animate-spin"></i>
+                    <span class="text-sm font-black text-white">SHORTS & REELS FEED</span>
+                </div>
+            </div>
+            <div id="shortsContainer" class="space-y-4">
+                <div class="text-center py-8 text-gray-400 text-xs font-bold">No shorts uploaded yet.</div>
+            </div>
+        </div>
+
+        <!-- 6. Movies Hub -->
+        <div id="section-movies" class="hidden space-y-4 py-4">
+            <div class="text-center mb-6">
+                <h3 class="text-lg font-black bg-gradient-to-r from-cryptoGold via-neonPink to-neonGreen bg-clip-text text-transparent">
+                    MOVIES & LONG VIDEOS HUB
+                </h3>
+                <p class="text-xs font-bold text-gray-400 mt-1">Full-length streams</p>
+            </div>
+            <div id="movieHubContainer" class="grid grid-cols-1 gap-4">
+                <div class="text-center py-8 text-gray-400 text-xs font-bold">No movies uploaded yet.</div>
+            </div>
+        </div>
+
+        <!-- 7. Karaoke Stage -->
+        <div id="section-karaoke" class="hidden space-y-4 py-4">
+            <div class="glass-panel rounded-3xl p-6 border border-neonPink/40 shadow-2xl text-center space-y-4">
+                <div class="w-16 h-16 rounded-full bg-neonPink/20 border border-neonPink/50 mx-auto flex items-center justify-center text-neonPink text-2xl shadow-lg">
+                    <i class="fa-solid fa-microphone-lines animate-pulse"></i>
+                </div>
+                <h3 class="text-base font-black text-white">KARAOKE MUSIC & SINGING STAGE</h3>
+                <p class="text-xs font-bold text-gray-400 max-w-xs mx-auto">Play background music tracks and sing live.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Share Modal -->
+    <div id="shareModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[1150] hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md rounded-3xl p-6 border border-cyanNeon/40 shadow-2xl space-y-5">
+            <div class="flex items-center justify-between border-b border-borderCol pb-3">
+                <h3 class="text-sm font-black text-cyanNeon flex items-center space-x-2">
+                    <i class="fa-solid fa-share-nodes"></i>
+                    <span>SHARE & EARN BONUS</span>
+                </h3>
+                <button onclick="closeShareModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="space-y-3">
+                <label class="block text-xs font-bold text-gray-300">Promotional Share Message (ID Included)</label>
+                <textarea id="shareMessageBox" rows="4" class="w-full bg-darkBg border border-borderCol rounded-xl p-3 text-xs text-white resize-none font-bold" readonly></textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button onclick="copyShareMessage()" class="py-3 bg-cardBg border border-borderCol text-cyanNeon font-black rounded-xl text-xs flex items-center justify-center space-x-2 active:scale-95 transition">
+                    <i class="fa-solid fa-copy"></i> <span>Copy Text & Link</span>
+                </button>
+                <button onclick="shareToSocialMedia()" class="py-3 bg-gradient-to-r from-neonGreen to-cyanNeon text-darkBg font-black rounded-xl text-xs flex items-center justify-center space-x-2 active:scale-95 transition">
+                    <i class="fa-brands fa-whatsapp"></i> <span>Share WhatsApp/FB</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tips Modal -->
+    <div id="tipsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[1100] hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md rounded-3xl p-5 border border-cryptoGold/40 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-borderCol pb-3">
+                <h3 class="text-sm font-black text-cryptoGold flex items-center space-x-2">
+                    <i class="fa-solid fa-coins"></i>
+                    <span>SEND CRYPTO TIPS (ALL 19 TOKENS)</span>
+                </h3>
+                <button onclick="closeTipsModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 mb-1">Tip Amount (Coins)</label>
+                    <input type="number" id="tipAmountInput" value="10" class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-white text-xs">
+                </div>
+                <div class="space-y-2 max-h-52 overflow-y-auto pr-1" id="tipsCoinsListContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div id="bottomNavBar" class="fixed bottom-0 left-0 right-0 bg-darkBg/95 backdrop-blur-lg border-t border-borderCol px-6 py-3 flex justify-between items-center z-30 max-w-xl mx-auto shadow-2xl">
+        <button onclick="switchTab('feed')" id="bnav-feed" class="flex flex-col items-center text-neonGreen font-extrabold">
+            <i class="fa-solid fa-house text-lg"></i>
+            <span class="text-[10px] mt-1">HOME</span>
+        </button>
+        <button onclick="switchTab('live')" id="bnav-live" class="flex flex-col items-center text-gray-400 hover:text-white font-extrabold">
+            <i class="fa-solid fa-tower-broadcast text-lg text-red-500"></i>
+            <span class="text-[10px] mt-1">LIVE</span>
+        </button>
+        <button onclick="switchTab('create')" id="bnav-create" class="flex flex-col items-center text-gray-400 hover:text-white font-extrabold">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-neonGreen via-cyanNeon to-cryptoGold flex items-center justify-center text-darkBg shadow-lg -mt-5 border-2 border-darkBg font-black text-base">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+            <span class="text-[10px] mt-1">CREATE</span>
+        </button>
+        <button onclick="switchTab('movies')" id="bnav-movies" class="flex flex-col items-center text-gray-400 hover:text-white font-extrabold">
+            <i class="fa-solid fa-film text-lg text-cryptoGold"></i>
+            <span class="text-[10px] mt-1">MOVIES</span>
+        </button>
+        <button onclick="switchTab('profile')" id="bnav-profile" class="flex flex-col items-center text-gray-400 hover:text-white font-extrabold">
+            <i class="fa-solid fa-user text-lg text-teal-400"></i>
+            <span class="text-[10px] mt-1">PROFILE</span>
+        </button>
+    </div>
+
+    <!-- Client Logic & Admin Configuration Engine -->
+    <script>
+        const tokenList = [
+            "MY GROUP (MG)", "SUCCESS (SCS)", "MY LIFE (MLF)", "MASTER (MTR)", "BULLET (BULT)", 
+            "JOKER (JKR)", "BULISH (BLH)", "BEARISH (BRH)", "HARAMI (HRM)", "DOJI (DOJI)", 
+            "SHIPING TOP (SGP)", "MARBUJU", "UNGALPING (ULG)", "BOWLD (BWD)", "SKY (SKY)", 
+            "ROKET (RKT)", "GAME (GME)", "SIXSAR (SSR)", "TROPHY (TPY)"
+        ];
+
+        function populateRewardDropdowns() {
+            const dropdowns = ['tier1Tok', 'tier2Tok', 'tier3Tok', 'rewardLikeTok', 'rewardCommentTok', 'rewardShareTok'];
+            dropdowns.forEach(id => {
+                let el = document.getElementById(id);
+                if(el) {
+                    el.innerHTML = "";
+                    tokenList.forEach(t => el.add(new Option(t, t)));
+                }
+            });
+        }
+        populateRewardDropdowns();
+
+        function renderAdminTipsCheckboxes() {
+            const container = document.getElementById('adminTipsCoinsCheckboxes');
+            if(!container) return;
+            container.innerHTML = "";
+            let savedChecked = JSON.parse(localStorage.getItem('mgsml_checked_tips') || JSON.stringify(tokenList.map(() => true)));
+            tokenList.forEach((token, index) => {
+                let isChecked = savedChecked[index] !== false;
+                let div = document.createElement('div');
+                div.className = "flex items-center justify-between bg-darkBg p-2 rounded-xl border border-borderCol text-xs";
+                div.innerHTML = `
+                    <span class="font-bold text-gray-200 truncate">${token}</span>
+                    <input type="checkbox" id="tip-chk-${index}" class="accent-neonGreen w-4 h-4" ${isChecked ? 'checked' : ''}>
+                `;
+                container.appendChild(div);
+            });
+        }
+        renderAdminTipsCheckboxes();
+
+        function loadAdminSavedConfig() {
+            if(document.getElementById('bunnyStorageZone')) document.getElementById('bunnyStorageZone').value = localStorage.getItem('mgsml_bunny_zone') || 'mgsml-media';
+            if(document.getElementById('bunnyApiKey')) document.getElementById('bunnyApiKey').value = localStorage.getItem('mgsml_bunny_key') || '';
+            if(document.getElementById('bunnyStreamKey')) document.getElementById('bunnyStreamKey').value = localStorage.getItem('mgsml_bunny_stream_key') || '';
+            if(document.getElementById('bunnyEndpointUrl')) document.getElementById('bunnyEndpointUrl').value = localStorage.getItem('mgsml_bunny_endpoint') || 'https://storage.bunnycdn.com';
+            if(document.getElementById('bunnyCdnUrl')) document.getElementById('bunnyCdnUrl').value = localStorage.getItem('mgsml_bunny_cdn') || 'https://mgsml-media-cdn.b-cdn.net/';
+            
+            if(document.getElementById('preRollAd')) document.getElementById('preRollAd').value = localStorage.getItem('mgsml_ad_pre') || '';
+            if(document.getElementById('midRollAd')) document.getElementById('midRollAd').value = localStorage.getItem('mgsml_ad_mid') || '';
+            if(document.getElementById('postRollAd')) document.getElementById('postRollAd').value = localStorage.getItem('mgsml_ad_post') || '';
+            if(document.getElementById('adStatusToggle')) document.getElementById('adStatusToggle').checked = localStorage.getItem('mgsml_ad_status') !== 'false';
+
+            if(document.getElementById('tgBotToken')) document.getElementById('tgBotToken').value = localStorage.getItem('mgsml_tg_token') || '';
+            if(document.getElementById('tgChatId')) document.getElementById('tgChatId').value = localStorage.getItem('mgsml_tg_chat') || '';
+
+            if(document.getElementById('linkFeed')) document.getElementById('linkFeed').value = localStorage.getItem('mgsml_link_feed') || '';
+            if(document.getElementById('linkShorts')) document.getElementById('linkShorts').value = localStorage.getItem('mgsml_link_shorts') || '';
+            if(document.getElementById('linkMovies')) document.getElementById('linkMovies').value = localStorage.getItem('mgsml_link_movies') || '';
+            if(document.getElementById('linkKaraoke')) document.getElementById('linkKaraoke').value = localStorage.getItem('mgsml_link_karaoke') || '';
+            if(document.getElementById('linkProfile')) document.getElementById('linkProfile').value = localStorage.getItem('mgsml_link_profile') || '';
+        }
+
+        window.saveBunnyConfig = function() {
+            localStorage.setItem('mgsml_bunny_zone', document.getElementById('bunnyStorageZone').value.trim());
+            localStorage.setItem('mgsml_bunny_key', document.getElementById('bunnyApiKey').value.trim());
+            localStorage.setItem('mgsml_bunny_stream_key', document.getElementById('bunnyStreamKey').value.trim());
+            localStorage.setItem('mgsml_bunny_endpoint', document.getElementById('bunnyEndpointUrl').value.trim());
+            localStorage.setItem('mgsml_bunny_cdn', document.getElementById('bunnyCdnUrl').value.trim());
+            alert("✨ Bunny.net Configuration Saved Successfully!");
+        };
+
+        window.saveSingleLink = function(key) {
+            let val = document.getElementById(`link${key.charAt(0).toUpperCase() + key.slice(1)}`).value.trim();
+            if(val) {
+                localStorage.setItem(`mgsml_link_${key}`, val);
+                alert(`✨ ${key.toUpperCase()} Link saved successfully!`);
+            } else {
+                alert("Please enter a valid link.");
+            }
+        };
+
+        window.enterSingleLink = function(key) {
+            let val = localStorage.getItem(`mgsml_link_${key}`);
+            if(val) window.open(val, '_blank'); else alert("No link configured.");
+        };
+
+        window.saveAdminMasterConfig = function() {
+            localStorage.setItem('mgsml_ad_pre', document.getElementById('preRollAd').value.trim());
+            localStorage.setItem('mgsml_ad_mid', document.getElementById('midRollAd').value.trim());
+            localStorage.setItem('mgsml_ad_post', document.getElementById('postRollAd').value.trim());
+            localStorage.setItem('mgsml_ad_status', document.getElementById('adStatusToggle').checked);
+
+            localStorage.setItem('mgsml_tg_token', document.getElementById('tgBotToken').value.trim());
+            localStorage.setItem('mgsml_tg_chat', document.getElementById('tgChatId').value.trim());
+
+            let checkedArr = tokenList.map((_, index) => {
+                let chk = document.getElementById(`tip-chk-${index}`);
+                return chk ? chk.checked : true;
+            });
+            localStorage.setItem('mgsml_checked_tips', JSON.stringify(checkedArr));
+
+            alert("✨ Master configuration saved and synced successfully!");
+            closeSecretAdminModal();
+        };
+
+        let selectedSocialFile = null;
+        let selectedSocialType = "";
+
+        window.previewSocialMedia = function(input) {
+            if (input.files && input.files[0]) {
+                selectedSocialFile = input.files[0];
+                let reader = new FileReader();
+                let container = document.getElementById('socialMediaPreviewContainer');
+                let imgTag = document.getElementById('socialPreviewImg');
+                let vidTag = document.getElementById('socialPreviewVid');
+
+                reader.onload = function(e) {
+                    container.classList.remove('hidden');
+                    if(selectedSocialFile.type.startsWith('image/')) {
+                        selectedSocialType = "image";
+                        imgTag.src = e.target.result;
+                        imgTag.classList.remove('hidden');
+                        vidTag.classList.add('hidden');
+                    } else {
+                        selectedSocialType = "video";
+                        vidTag.src = e.target.result;
+                        vidTag.classList.remove('hidden');
+                        imgTag.classList.add('hidden');
+                    }
+                };
+                reader.readAsDataURL(selectedSocialFile);
+            }
+        };
+
+        window.publishSocialPost = async function() {
+            let text = document.getElementById('socialPostText').value.trim();
+            if(!text && !selectedSocialFile) {
+                alert("Please write something or select media!");
+                return;
+            }
+
+            let mediaUrl = "";
+            if(selectedSocialFile) {
+                mediaUrl = await uploadToBunnyStrict(selectedSocialFile);
+            }
+
+            let savedPosts = JSON.parse(localStorage.getItem('mgsml_social_posts') || '[]');
+            savedPosts.unshift({ text, mediaUrl, type: selectedSocialType || 'text', time: "Just now" });
+            localStorage.setItem('mgsml_social_posts', JSON.stringify(savedPosts));
+
+            document.getElementById('socialPostText').value = "";
+            document.getElementById('socialMediaPreviewContainer').classList.add('hidden');
+            document.getElementById('socialPostMediaFile').value = "";
+            selectedSocialFile = null;
+            selectedSocialType = "";
+            loadHomeFeedContent();
+            alert("✨ Post published successfully!");
+        };
+
+        window.handleBunnyCloudUpload = async function() {
+            let title = document.getElementById('directVideoTitle').value.trim();
+            let desc = document.getElementById('directVideoDesc').value.trim();
+            let fileInput = document.getElementById('directVideoFile');
+            let file = fileInput.files[0];
+
+            let apiKey = localStorage.getItem('mgsml_bunny_key') || "";
+            if (!apiKey || apiKey.length < 3) {
+                alert("⚠️ Please enter your Bunny.net Storage API Key in Secret Admin Panel first!");
+                return;
+            }
+
+            if(!title || !file) {
+                alert("Please enter a title and select a video or audio file!");
+                return;
+            }
+
+            let progressWrapper = document.getElementById('uploadProgressWrapper');
+            let progressBar = document.getElementById('uploadProgressBar');
+            let progressPercent = document.getElementById('uploadPercentage');
+            let statusText = document.getElementById('uploadStatusText');
+            let uploadBtn = document.getElementById('uploadBtnElement');
+
+            progressWrapper.classList.remove('hidden');
+            uploadBtn.disabled = true;
+            uploadBtn.classList.add('opacity-50');
+            statusText.innerText = "Uploading directly to Bunny.net Cloud...";
+
+            try {
+                let isAudio = file.type.startsWith('audio/') || file.name.match(/\.(mp3|m4a|wav|ogg)$/i);
+                let mediaKind = isAudio ? 'audio' : 'video';
+
+                let fileUrl = await uploadToBunnyStrict(file, (percent) => {
+                    progressBar.style.width = percent + '%';
+                    progressPercent.innerText = percent + '%';
+                });
+
+                statusText.innerText = "Upload Complete!";
+                saveMovieData(title, desc, fileUrl, mediaKind);
+            } catch (err) {
+                console.error("Bunny Upload Error:", err);
+                alert("❌ Upload failed! Please check your Bunny.net Storage Zone Name and Access Key in Admin Panel.");
+                uploadBtn.disabled = false;
+                uploadBtn.classList.remove('opacity-50');
+                progressWrapper.classList.add('hidden');
+            }
+        };
+
+        function uploadToBunnyStrict(file, progressCallback) {
+            return new Promise((resolve, reject) => {
+                let storageZone = localStorage.getItem('mgsml_bunny_zone') || "mgsml-media";
+                let apiKey = localStorage.getItem('mgsml_bunny_key') || "";
+                let endpointUrl = localStorage.getItem('mgsml_bunny_endpoint') || "https://storage.bunnycdn.com";
+                let cdnUrl = localStorage.getItem('mgsml_bunny_cdn') || "https://mgsml-media-cdn.b-cdn.net/";
+
+                let fileName = Date.now() + "_" + file.name.replace(/\s+/g, '_');
+                let cleanEndpoint = endpointUrl.replace(/\/$/, '');
+                let uploadUrl = `${cleanEndpoint}/${storageZone}/${fileName}`;
+
+                let xhr = new XMLHttpRequest();
+                xhr.open('PUT', uploadUrl, true);
+                xhr.setRequestHeader('AccessKey', apiKey);
+                xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+
+                xhr.upload.onprogress = function(e) {
+                    if (e.lengthComputable && progressCallback) {
+                        let percent = Math.round((e.loaded / e.total) * 100);
+                        progressCallback(percent);
+                    }
+                };
+
+                xhr.onload = function() {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        if (progressCallback) progressCallback(100);
+                        let cleanCdn = cdnUrl.endsWith('/') ? cdnUrl : cdnUrl + '/';
+                        let finalFileUrl = `${cleanCdn}${storageZone}/${fileName}`;
+                        resolve(finalFileUrl);
+                    } else {
+                        reject(new Error(`Server returned status ${xhr.status}`));
+                    }
+                };
+
+                xhr.onerror = function() {
+                    reject(new Error("Network error during Bunny.net upload."));
+                };
+
+                xhr.send(file);
+            });
+        }
+
+        function saveMovieData(title, desc, videoUrl, mediaKind) {
+            let savedMovies = JSON.parse(localStorage.getItem('mgsml_bunny_movies') || '[]');
+            let newMovie = { 
+                id: Date.now(),
+                title, 
+                description: desc, 
+                videoUrl, 
+                mediaKind: mediaKind || 'video',
+                views: Math.floor(Math.random() * 500) + 15,
+                likes: 0,
+                comments: []
+            };
+            savedMovies.unshift(newMovie);
+            localStorage.setItem('mgsml_bunny_movies', JSON.stringify(savedMovies));
+
+            let currentBal = parseInt(localStorage.getItem('mgsml_wallet_bal') || '1250') + 100;
+            localStorage.setItem('mgsml_wallet_bal', currentBal);
+            document.getElementById('userMGSMLBalance').innerText = currentBal;
+
+            alert("🎉 Success! File uploaded successfully to Bunny.net Cloud & +100 MGSML Bonus Claimed!");
+            
+            document.getElementById('directVideoTitle').value = "";
+            document.getElementById('directVideoDesc').value = "";
+            document.getElementById('directVideoFile').value = "";
+            document.getElementById('uploadProgressWrapper').classList.add('hidden');
+            let uploadBtn = document.getElementById('uploadBtnElement');
+            uploadBtn.disabled = false;
+            uploadBtn.classList.remove('opacity-50');
+
+            switchTab('movies');
+            loadHomeFeedContent();
+            loadMoviesAndShorts();
+        }
+
+        function renderMediaTag(mov) {
+            let isAudio = mov.mediaKind === 'audio' || (mov.videoUrl && (mov.videoUrl.includes('.mp3') || mov.videoUrl.includes('.m4a') || mov.videoUrl.includes('.wav') || mov.videoUrl.includes('.ogg')));
+            
+            // ক্যাশ-বাস্টিং ও স্ট্রিম প্যারামিটার যুক্ত করা হলো যাতে ব্রাউজার মেটাডেটা পড়তে পারে
+            let streamUrl = mov.videoUrl + (mov.videoUrl.includes('?') ? '&' : '?') + 'v=' + Date.now();
+            
+            if (isAudio) {
+                return `
+                    <div class="relative rounded-xl p-6 bg-gradient-to-r from-gray-900 via-cardBg to-gray-900 border border-borderCol flex flex-col items-center justify-center space-y-4 shadow-inner">
+                        <div class="watermark-badge">MGSML AUDIO</div>
+                        <div class="w-16 h-16 rounded-full bg-cryptoGold/20 border border-cryptoGold flex items-center justify-center text-cryptoGold text-2xl shadow-lg animate-pulse">
+                            <i class="fa-solid fa-music"></i>
+                        </div>
+                        <audio src="${streamUrl}" controls preload="auto" crossorigin="anonymous" class="w-full"></audio>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="relative rounded-xl overflow-hidden border border-borderCol bg-black flex items-center justify-center shadow-lg">
+                        <div class="watermark-badge">MGSML SKY</div>
+                        <video src="${streamUrl}" controls playsinline preload="auto" crossorigin="anonymous" class="w-full max-h-[450px] object-contain"></video>
+                    </div>
+                `;
+            }
+        }
+
+        window.loadHomeFeedContent = function() {
+            let container = document.getElementById('manualPostsContainer');
+            if(!container) return;
+
+            let savedPosts = JSON.parse(localStorage.getItem('mgsml_social_posts') || '[]');
+            let savedMovies = JSON.parse(localStorage.getItem('mgsml_bunny_movies') || '[]');
+
+            let html = "";
+            
+            savedPosts.forEach(post => {
+                let mediaHtml = "";
+                if(post.type === "image" && post.mediaUrl) {
+                    mediaHtml = `<div class="rounded-xl overflow-hidden mb-3 border border-borderCol"><img src="${post.mediaUrl}" class="w-full object-cover max-h-80"></div>`;
+                } else if(post.type === "video" && post.mediaUrl) {
+                    let streamMediaUrl = post.mediaUrl + (post.mediaUrl.includes('?') ? '&' : '?') + 'v=' + Date.now();
+                    mediaHtml = `<div class="relative rounded-xl overflow-hidden mb-3 border border-borderCol bg-black"><video src="${streamMediaUrl}" controls playsinline preload="auto" crossorigin="anonymous" class="w-full max-h-80"></video></div>`;
+                }
+
+                html += `
+                    <article class="glass-panel rounded-2xl p-4 shadow-xl relative border border-borderCol/60 mb-4">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces" class="w-10 h-10 rounded-full border border-neonGreen/50 object-cover">
+                            <div>
+                                <h4 class="text-sm font-extrabold text-gray-100">MGSML Creator</h4>
+                                <span class="text-[10px] text-gray-400">${post.time} • <i class="fa-solid fa-earth-americas"></i></span>
+                            </div>
+                        </div>
+                        ${post.text ? `<p class="text-sm font-bold text-white mb-3 whitespace-pre-wrap">${escapeHtml(post.text)}</p>` : ''}
+                        ${mediaHtml}
+                    </article>
+                `;
+            });
+
+            savedMovies.forEach((mov, index) => {
+                let commentsListHtml = (mov.comments || []).map(c => `<div class="text-[11px] bg-darkBg p-1.5 rounded-lg border border-borderCol text-gray-300 mt-1">${escapeHtml(c)}</div>`).join('');
+
+                html += `
+                    <article class="glass-panel rounded-2xl p-4 shadow-xl relative border border-borderCol/60 mb-4 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-sm font-black text-gray-100">${escapeHtml(mov.title)}</h4>
+                            <span class="text-[11px] font-bold text-cyanNeon"><i class="fa-solid fa-eye mr-1"></i>${mov.views || 10} Views</span>
+                        </div>
+                        <p class="text-xs text-gray-300">${escapeHtml(mov.description || "No description")}</p>
+                        ${renderMediaTag(mov)}
+                        
+                        <div class="flex items-center justify-between pt-2 border-t border-borderCol text-xs font-bold">
+                            <button onclick="likeMovie(${index})" class="flex items-center space-x-1.5 text-neonGreen hover:scale-105 transition"><i class="fa-solid fa-heart"></i> <span id="like-count-${index}">${mov.likes || 0}</span></button>
+                            <button onclick="openTipsModal()" class="flex items-center space-x-1.5 text-cryptoGold hover:scale-105 transition"><i class="fa-solid fa-coins"></i> <span>Tips</span></button>
+                            <button onclick="openShareModal()" class="flex items-center space-x-1.5 text-cyanNeon hover:scale-105 transition"><i class="fa-solid fa-share-nodes"></i> <span>Share</span></button>
+                        </div>
+
+                        <div class="space-y-2 pt-1 border-t border-borderCol/40">
+                            <div class="flex space-x-2">
+                                <input type="text" id="comment-input-${index}" placeholder="Write a comment..." class="flex-1 bg-darkBg border border-borderCol rounded-xl px-3 py-1.5 text-xs text-white">
+                                <button onclick="addComment(${index})" class="px-3 py-1.5 bg-neonPink text-white font-black rounded-xl text-xs">Post</button>
+                            </div>
+                            <div id="comments-box-${index}" class="space-y-1 max-h-32 overflow-y-auto">${commentsListHtml}</div>
+                        </div>
+                    </article>
+                `;
+            });
+
+            container.innerHTML = html;
+        };
+
+        window.loadMoviesAndShorts = function() {
+            let moviesContainer = document.getElementById('movieHubContainer');
+            let shortsContainer = document.getElementById('shortsContainer');
+            if(!moviesContainer) return;
+
+            let savedMovies = JSON.parse(localStorage.getItem('mgsml_bunny_movies') || '[]');
+            if(savedMovies.length === 0) {
+                moviesContainer.innerHTML = `<div class="text-center py-8 text-gray-400 text-xs font-bold">No movies uploaded yet.</div>`;
+                if(shortsContainer) shortsContainer.innerHTML = `<div class="text-center py-8 text-gray-400 text-xs font-bold">No shorts uploaded yet.</div>`;
+                return;
+            }
+
+            let movieHtml = "";
+            let shortsHtml = "";
+
+            savedMovies.forEach((mov, index) => {
+                let commentsListHtml = (mov.comments || []).map(c => `<div class="text-[11px] bg-darkBg p-1.5 rounded-lg border border-borderCol text-gray-300 mt-1">${escapeHtml(c)}</div>`).join('');
+                let streamShortsUrl = mov.videoUrl + (mov.videoUrl.includes('?') ? '&' : '?') + 'v=' + Date.now();
+
+                movieHtml += `
+                    <article class="glass-panel rounded-2xl p-4 shadow-xl relative border border-borderCol/60 mb-4 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-sm font-black text-gray-100">${escapeHtml(mov.title)}</h4>
+                            <span class="text-[11px] font-bold text-cyanNeon"><i class="fa-solid fa-eye mr-1"></i>${mov.views || 10} Views</span>
+                        </div>
+                        <p class="text-xs text-gray-300">${escapeHtml(mov.description || "No description")}</p>
+                        ${renderMediaTag(mov)}
+                        <div class="flex items-center justify-between pt-2 border-t border-borderCol text-xs font-bold">
+                            <button onclick="likeMovie(${index})" class="flex items-center space-x-1.5 text-neonGreen hover:scale-105 transition"><i class="fa-solid fa-heart"></i> <span id="like-count-mov-${index}">${mov.likes || 0}</span></button>
+                            <button onclick="openTipsModal()" class="flex items-center space-x-1.5 text-cryptoGold hover:scale-105 transition"><i class="fa-solid fa-coins"></i> <span>Tips</span></button>
+                            <button onclick="openShareModal()" class="flex items-center space-x-1.5 text-cyanNeon hover:scale-105 transition"><i class="fa-solid fa-share-nodes"></i> <span>Share</span></button>
+                        </div>
+                        <div class="space-y-2 pt-1 border-t border-borderCol/40">
+                            <div class="flex space-x-2">
+                                <input type="text" id="comment-input-mov-${index}" placeholder="Write a comment..." class="flex-1 bg-darkBg border border-borderCol rounded-xl px-3 py-1.5 text-xs text-white">
+                                <button onclick="addComment(${index}, true)" class="px-3 py-1.5 bg-neonPink text-white font-black rounded-xl text-xs">Post</button>
+                            </div>
+                            <div id="comments-box-mov-${index}" class="space-y-1 max-h-32 overflow-y-auto">${commentsListHtml}</div>
+                        </div>
+                    </article>
+                `;
+
+                shortsHtml += `
+                    <div class="relative bg-black rounded-3xl overflow-hidden border border-borderCol h-[580px] flex flex-col justify-between shadow-2xl mb-4 p-4">
+                        <div class="watermark-badge">MGSML SKY</div>
+                        <video src="${streamShortsUrl}" controls playsinline preload="auto" crossorigin="anonymous" loop class="absolute inset-0 w-full h-full object-cover z-0"></video>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/30 pointer-events-none z-10"></div>
+                        
+                        <div class="relative z-20 flex justify-between items-center text-xs font-bold text-white pt-2">
+                            <span class="bg-cardBg/80 px-2 py-1 rounded-lg backdrop-blur"><i class="fa-solid fa-eye text-cyanNeon mr-1"></i>${mov.views || 15} Views</span>
+                            <span class="bg-neonPink/80 px-2 py-1 rounded-lg backdrop-blur">Shorts</span>
+                        </div>
+                        <div class="relative z-20 space-y-3">
+                            <div class="flex items-center justify-around bg-cardBg/70 backdrop-blur-md p-2.5 rounded-2xl border border-borderCol">
+                                <button onclick="likeMovie(${index})" class="flex flex-col items-center text-neonGreen text-xs font-bold"><i class="fa-solid fa-heart text-base mb-0.5"></i><span>${mov.likes || 0}</span></button>
+                                <button onclick="openTipsModal()" class="flex flex-col items-center text-cryptoGold text-xs font-bold"><i class="fa-solid fa-coins text-base mb-0.5"></i><span>Tips</span></button>
+                                <button onclick="openShareModal()" class="flex flex-col items-center text-cyanNeon text-xs font-bold"><i class="fa-solid fa-share-nodes text-base mb-0.5"></i><span>Share</span></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            moviesContainer.innerHTML = movieHtml;
+            if(shortsContainer) shortsContainer.innerHTML = shortsHtml;
+        };
+
+        window.likeMovie = function(index) {
+            let savedMovies = JSON.parse(localStorage.getItem('mgsml_bunny_movies') || '[]');
+            if(savedMovies[index]) {
+                savedMovies[index].likes = (savedMovies[index].likes || 0) + 1;
+                localStorage.setItem('mgsml_bunny_movies', JSON.stringify(savedMovies));
+                
+                let likeSpan1 = document.getElementById(`like-count-${index}`);
+                let likeSpan2 = document.getElementById(`like-count-mov-${index}`);
+                if(likeSpan1) likeSpan1.innerText = savedMovies[index].likes;
+                if(likeSpan2) likeSpan2.innerText = savedMovies[index].likes;
+
+                let currentBal = parseInt(localStorage.getItem('mgsml_wallet_bal') || '1250') + 10;
+                localStorage.setItem('mgsml_wallet_bal', currentBal);
+                document.getElementById('userMGSMLBalance').innerText = currentBal;
+            }
+        };
+
+        window.addComment = function(index, isMovieTab = false) {
+            let inputId = isMovieTab ? `comment-input-mov-${index}` : `comment-input-${index}`;
+            let boxId = isMovieTab ? `comments-box-mov-${index}` : `comments-box-${index}`;
+            let input = document.getElementById(inputId);
+            let val = input ? input.value.trim() : "";
+            if(!val) return;
+            let savedMovies = JSON.parse(localStorage.getItem('mgsml_bunny_movies') || '[]');
+            if(savedMovies[index]) {
+                if(!savedMovies[index].comments) savedMovies[index].comments = [];
+                savedMovies[index].comments.push(val);
+                localStorage.setItem('mgsml_bunny_movies', JSON.stringify(savedMovies));
+                
+                let commentsBox = document.getElementById(boxId);
+                if(commentsBox) {
+                    let div = document.createElement('div');
+                    div.className = "text-[11px] bg-darkBg p-1.5 rounded-lg border border-borderCol text-gray-300 mt-1";
+                    div.innerText = val;
+                    commentsBox.appendChild(div);
+                }
+                input.value = "";
+
+                let currentBal = parseInt(localStorage.getItem('mgsml_wallet_bal') || '1250') + 15;
+                localStorage.setItem('mgsml_wallet_bal', currentBal);
+                document.getElementById('userMGSMLBalance').innerText = currentBal;
+            }
+        };
+
+        window.openShareModal = function() {
+            let userId = localStorage.getItem('mgsml_user_id') || "MGSML2001";
+            let baseUrl = "https://mgsmlsky.com/";
+            let shareText = `Welcome to MGSML Sky Project! I am earning very well from here. You can also join us, upload videos, watch, like, comment, and earn great crypto rewards daily! Join through my referral link: ${baseUrl}#${userId}`;
+            
+            document.getElementById('shareMessageBox').value = shareText;
+            document.getElementById('shareModal').classList.remove('hidden');
+        };
+
+        window.closeShareModal = function() { document.getElementById('shareModal').classList.add('hidden'); };
+        window.copyShareMessage = function() {
+            let textBox = document.getElementById('shareMessageBox');
+            textBox.select();
+            navigator.clipboard.writeText(textBox.value);
+            alert("✨ Clean share link & text copied successfully!");
+            closeShareModal();
+        };
+        window.shareToSocialMedia = function() {
+            let textBox = document.getElementById('shareMessageBox').value;
+            if (navigator.share) {
+                navigator.share({ title: 'MGSML Sky Project', text: textBox }).catch(() => {});
+            } else {
+                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(textBox)}`, '_blank');
+            }
+        };
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        window.openLeftDrawer = function() { document.getElementById('leftDrawer').classList.remove('hidden'); };
+        window.closeLeftDrawer = function() { document.getElementById('leftDrawer').classList.add('hidden'); };
+
+        window.checkSecretAdminPassword = function(event) {
+            if (event.key === 'Enter') {
+                let inputVal = document.getElementById('secretAdminInput').value;
+                let currentPass = localStorage.getItem('mgsml_admin_pass') || "1234";
+                if (inputVal === currentPass) {
+                    document.getElementById('secretAdminInput').value = '';
+                    closeLeftDrawer();
+                    document.getElementById('secretAdminModal').classList.remove('hidden');
+                } else {
+                    alert("Incorrect Password!");
+                    document.getElementById('secretAdminInput').value = '';
+                }
+            }
+        };
+
+        window.closeSecretAdminModal = function() { document.getElementById('secretAdminModal').classList.add('hidden'); };
+
+        window.saveNewAdminPassword = function() {
+            let p1 = document.getElementById('newAdminPass').value;
+            let p2 = document.getElementById('confirmAdminPass').value;
+            if(!p1 || p1 !== p2) { alert("Passwords do not match or empty!"); return; }
+            localStorage.setItem('mgsml_admin_pass', p1);
+            alert("✨ Admin password updated successfully!");
+        };
+
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn px-4 py-2.5 rounded-xl text-sm font-extrabold whitespace-nowrap bg-cardBg text-gray-400 border border-borderCol";
+            });
+            document.querySelectorAll('#mainContainersHolder > div').forEach(div => { div.classList.add('hidden'); });
+            
+            const activeBtn = document.getElementById(`btn-${tabName}`);
+            if(activeBtn) { activeBtn.className = "tab-btn px-4 py-2.5 rounded-xl text-sm font-extrabold whitespace-nowrap bg-neonGreen text-darkBg shadow-lg shadow-neonGreen/20"; }
+            
+            const activeSection = document.getElementById(`section-${tabName}`);
+            if(activeSection) activeSection.classList.remove('hidden');
+
+            const mainHeader = document.getElementById('mainHeaderBar');
+            const topNav = document.getElementById('topNavTabs');
+            const bottomNav = document.getElementById('bottomNavBar');
+
+            if (tabName === 'live' || tabName === 'profile') {
+                if(mainHeader) mainHeader.classList.add('hidden');
+                if(topNav) topNav.classList.add('hidden');
+                if(bottomNav) bottomNav.classList.add('hidden');
+            } else {
+                if(mainHeader) mainHeader.classList.remove('hidden');
+                if(topNav) topNav.classList.remove('hidden');
+                if(bottomNav) bottomNav.classList.remove('hidden');
+            }
+        };
+
+        window.openTipsModal = function() {
+            document.getElementById('tipsModal').classList.remove('hidden');
+            let container = document.getElementById('tipsCoinsListContainer');
+            if(!container) return;
+            container.innerHTML = "";
+            let savedChecked = JSON.parse(localStorage.getItem('mgsml_checked_tips') || JSON.stringify(tokenList.map(() => true)));
+            tokenList.forEach((token, index) => {
+                if(savedChecked[index] !== false) {
+                    let div = document.createElement('div');
+                    div.className = "flex items-center justify-between bg-darkBg p-2.5 rounded-xl border border-borderCol text-xs";
+                    div.innerHTML = `
+                        <span class="font-bold text-gray-200">${token}</span>
+                        <button onclick="sendTip('${token}')" class="px-3 py-1 bg-cryptoGold text-darkBg font-black rounded-lg text-xs">Send Tip</button>
+                    `;
+                    container.appendChild(div);
+                }
+            });
+        };
+        window.closeTipsModal = function() { document.getElementById('tipsModal').classList.add('hidden'); };
+        window.sendTip = function(tokenName) {
+            let qty = document.getElementById('tipAmountInput').value || 10;
+            alert(`✨ Successfully sent ${qty} tips in ${tokenName}!`);
+            closeTipsModal();
+        };
+
+        loadAdminSavedConfig();
+        loadHomeFeedContent();
+        loadMoviesAndShorts();
+    </script>
+</body>
+</html>
