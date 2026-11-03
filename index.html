@@ -248,7 +248,9 @@
                 <i class="fa-solid fa-chevron-right text-gray-400"></i>
             </div>
             
-            <div id="manualPostsContainer" class="space-y-4"></div>
+            <div id="manualPostsContainer" class="space-y-4">
+                <div class="text-center py-12 text-gray-400 text-xs font-bold">Syncing with Bunny.net Cloud...</div>
+            </div>
         </div>
 
         <!-- 2. Live Stream Sub-Page -->
@@ -309,7 +311,7 @@
             </div>
         </div>
 
-        <!-- 4. Creator Profile Sub-Page (Clean without login buttons) -->
+        <!-- 4. Creator Profile Sub-Page -->
         <div id="section-profile" class="hidden space-y-4">
             <div class="py-2 flex items-center justify-between">
                 <button onclick="switchTab('feed')" class="px-3 py-1.5 bg-cardBg border border-borderCol rounded-xl text-xs font-bold text-gray-300 hover:text-white flex items-center space-x-1.5 active:scale-95 transition">
@@ -442,7 +444,7 @@
         </button>
     </div>
 
-    <!-- Client Logic & Global Cloud Sync Engine -->
+    <!-- Client Logic & Robust Bunny.net Cloud Fetching Engine -->
     <script>
         const tokenList = [
             "MY GROUP (MG)", "SUCCESS (SCS)", "MY LIFE (MLF)", "MASTER (MTR)", "BULLET (BULT)", 
@@ -464,6 +466,7 @@
             localStorage.setItem('mgsml_bunny_endpoint', document.getElementById('bunnyEndpointUrl').value.trim());
             localStorage.setItem('mgsml_bunny_cdn', document.getElementById('bunnyCdnUrl').value.trim());
             alert("✨ Bunny.net Configuration Saved Successfully!");
+            fetchBunnyVideosDynamic();
         };
 
         window.saveAdminMasterConfig = function() {
@@ -471,6 +474,7 @@
             closeSecretAdminModal();
         };
 
+        // --- ROBUST DIRECT BUNNY.NET UPLOAD ENGINE ---
         window.handleBunnyCloudUpload = async function() {
             let title = document.getElementById('directVideoTitle').value.trim();
             let desc = document.getElementById('directVideoDesc').value.trim();
@@ -500,29 +504,7 @@
             statusText.innerText = "Uploading directly to Bunny.net Cloud...";
 
             try {
-                let isAudio = file.type.startsWith('audio/') || file.name.match(/\.(mp3|m4a|wav|ogg)$/i);
-                let mediaKind = isAudio ? 'audio' : 'video';
-
-                let fileUrl = await uploadToBunnyStrict(file, (percent) => {
-                    progressBar.style.width = percent + '%';
-                    progressPercent.innerText = percent + '%';
-                });
-
-                statusText.innerText = "Upload Complete!";
-                saveMovieData(title, desc, fileUrl, mediaKind);
-            } catch (err) {
-                console.error("Bunny Upload Error:", err);
-                alert("❌ Upload failed! Please check your Bunny.net Storage Zone Name and Access Key in Admin Panel.");
-                uploadBtn.disabled = false;
-                uploadBtn.classList.remove('opacity-50');
-                progressWrapper.classList.add('hidden');
-            }
-        };
-
-        function uploadToBunnyStrict(file, progressCallback) {
-            return new Promise((resolve, reject) => {
                 let storageZone = localStorage.getItem('mgsml_bunny_zone') || "mgsml-media";
-                let apiKey = localStorage.getItem('mgsml_bunny_key') || "";
                 let endpointUrl = localStorage.getItem('mgsml_bunny_endpoint') || "https://storage.bunnycdn.com";
                 let cdnUrl = localStorage.getItem('mgsml_bunny_cdn') || "https://mgsml-media-cdn.b-cdn.net/";
 
@@ -536,32 +518,41 @@
                 xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
 
                 xhr.upload.onprogress = function(e) {
-                    if (e.lengthComputable && progressCallback) {
+                    if (e.lengthComputable) {
                         let percent = Math.round((e.loaded / e.total) * 100);
-                        progressCallback(percent);
+                        progressBar.style.width = percent + '%';
+                        progressPercent.innerText = percent + '%';
                     }
                 };
 
                 xhr.onload = function() {
                     if (xhr.status >= 200 && xhr.status < 300) {
-                        if (progressCallback) progressCallback(100);
+                        statusText.innerText = "Upload Complete!";
                         let cleanCdn = cdnUrl.endsWith('/') ? cdnUrl : cdnUrl + '/';
                         let finalFileUrl = `${cleanCdn}${storageZone}/${fileName}`;
-                        resolve(finalFileUrl);
+                        
+                        let isAudio = file.type.startsWith('audio/') || file.name.match(/\.(mp3|m4a|wav|ogg)$/i);
+                        saveMovieDataLocally(title, desc, finalFileUrl, isAudio ? 'audio' : 'video');
                     } else {
-                        reject(new Error(`Server returned status ${xhr.status}`));
+                        throw new Error(`Server returned status ${xhr.status}`);
                     }
                 };
 
                 xhr.onerror = function() {
-                    reject(new Error("Network error during Bunny.net upload."));
+                    throw new Error("Network error during Bunny.net upload.");
                 };
 
                 xhr.send(file);
-            });
-        }
+            } catch (err) {
+                console.error("Bunny Upload Error:", err);
+                alert("❌ Upload failed! Please check your Bunny.net Storage Zone Name and Access Key in Admin Panel.");
+                uploadBtn.disabled = false;
+                uploadBtn.classList.remove('opacity-50');
+                progressWrapper.classList.add('hidden');
+            }
+        };
 
-        function saveMovieData(title, desc, videoUrl, mediaKind) {
+        function saveMovieDataLocally(title, desc, videoUrl, mediaKind) {
             let savedMovies = JSON.parse(localStorage.getItem('mgsml_bunny_movies') || '[]');
             let newMovie = { 
                 id: Date.now(),
@@ -597,7 +588,7 @@
 
         function renderMediaTag(mov) {
             let isAudio = mov.mediaKind === 'audio' || (mov.videoUrl && (mov.videoUrl.includes('.mp3') || mov.videoUrl.includes('.m4a') || mov.videoUrl.includes('.wav') || mov.videoUrl.includes('.ogg')));
-            let streamUrl = mov.videoUrl + (mov.videoUrl.includes('?') ? '&' : '?') + 'v=' + Date.now();
+            let streamUrl = mov.videoUrl;
             
             if (isAudio) {
                 return `
@@ -655,7 +646,7 @@
                 `;
             });
 
-            container.innerHTML = html || `<div class="text-center py-12 text-gray-400 text-xs font-bold">No public feed videos found.</div>`;
+            container.innerHTML = html || `<div class="text-center py-12 text-gray-400 text-xs font-bold">No public feed videos found. Upload files via Create tab.</div>`;
         };
 
         window.loadMoviesAndShorts = function() {
@@ -675,7 +666,7 @@
 
             savedMovies.forEach((mov, index) => {
                 let commentsListHtml = (mov.comments || []).map(c => `<div class="text-[11px] bg-darkBg p-1.5 rounded-lg border border-borderCol text-gray-300 mt-1">${escapeHtml(c)}</div>`).join('');
-                let streamShortsUrl = mov.videoUrl + (mov.videoUrl.includes('?') ? '&' : '?') + 'v=' + Date.now();
+                let streamShortsUrl = mov.videoUrl;
 
                 movieHtml += `
                     <article class="glass-panel rounded-2xl p-4 shadow-xl relative border border-borderCol/60 mb-4 space-y-3">
@@ -878,7 +869,7 @@
             closeTipsModal();
         };
 
-        // --- GLOBAL BUNNY.NET STORAGE AUTO-SYNC FETCHING FOR ALL USERS ---
+        // --- ROBUST GLOBAL BUNNY.NET STORAGE AUTO-SYNC FETCHING ENGINE ---
         async function fetchBunnyVideosDynamic() {
             let storageZone = localStorage.getItem('mgsml_bunny_zone') || "mgsml-media";
             let apiKey = localStorage.getItem('mgsml_bunny_key') || "";
@@ -908,15 +899,16 @@
                         return {
                             id: file.Id || Date.now(),
                             title: file.ObjectName.replace(/^\d+_[a-zA-Z0-9]+_/, '').replace(/_/g, ' '),
-                            description: "Global Stream from Bunny.net Cloud",
+                            description: "Global Stream from Bunny.net Cloud Storage",
                             videoUrl: videoUrl,
                             mediaKind: file.ObjectName.match(/\.(mp3|m4a|wav|ogg)$/i) ? 'audio' : 'video',
                             views: Math.floor(Math.random() * 500) + 15,
                             likes: 0,
-                            comments: []
+            comments: []
                         };
                     });
 
+                    // ক্লাউড থেকে পাওয়া ফাইলগুলো লোকাল স্টোরেজে স্থায়ীভাবে সিঙ্ক করা
                     localStorage.setItem('mgsml_bunny_movies', JSON.stringify(fetchedMovies));
                     loadHomeFeedContent();
                     loadMoviesAndShorts();
@@ -929,7 +921,7 @@
         loadAdminSavedConfig();
         loadHomeFeedContent();
         loadMoviesAndShorts();
-        fetchBunnyVideosDynamic();
+        fetchBunnyVideosDynamic(); // অ্যাপ ওপেন হওয়ার সাথেই ক্লাউড থেকে ফাইল সিঙ্ক করবে
     </script>
 </body>
 </html>
