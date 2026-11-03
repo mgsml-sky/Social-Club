@@ -146,7 +146,7 @@
         <div class="flex-1" onclick="closeLeftDrawer()"></div>
     </div>
 
-    <!-- Secret Master Admin Panel -->
+    <!-- Secret Master Admin Panel (With 19 Tokens & Password Config) -->
     <div id="secretAdminModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[1000] hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-xl rounded-3xl p-6 border border-red-500/40 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between border-b border-borderCol pb-3">
@@ -158,7 +158,6 @@
             </div>
 
             <div class="space-y-6 text-xs font-semibold">
-                <!-- 1. Change Password -->
                 <div class="bg-cardBg p-4 rounded-2xl border border-red-500/40 space-y-3">
                     <h4 class="font-extrabold text-red-400">1. CHANGE ADMIN PASSWORD</h4>
                     <div class="space-y-2">
@@ -174,15 +173,8 @@
                     <button onclick="saveNewAdminPassword()" class="py-2 px-4 bg-red-600 text-white font-black rounded-xl text-xs">UPDATE PASSWORD</button>
                 </div>
 
-                <!-- 2. Bunny Config Display -->
-                <div class="bg-cardBg p-5 rounded-2xl border border-neonGreen/40 space-y-4">
-                    <h4 class="font-extrabold text-neonGreen">2. BUNNY.NET STORAGE & STREAM CONFIG (MASTER)</h4>
-                    <p class="text-[11px] text-gray-400">Configured via code for global access without prompting users.</p>
-                </div>
-
-                <!-- 3. Tips Coins Manager (19 Tokens) -->
                 <div class="bg-cardBg p-4 rounded-2xl border border-cryptoGold/40 space-y-3">
-                    <h4 class="font-extrabold text-cryptoGold">3. TIPS COINS MANAGER (19 TOKENS)</h4>
+                    <h4 class="font-extrabold text-cryptoGold">2. TIPS COINS MANAGER (ALL 19 TOKENS)</h4>
                     <div id="adminTipsCoinsCheckboxes" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1"></div>
                 </div>
 
@@ -260,7 +252,7 @@
             </div>
         </div>
 
-        <!-- 3. Create Module -->
+        <!-- 3. Create Module (Direct Bunny.net Cloud Upload with Progress Bar) -->
         <div id="section-create" class="hidden space-y-4">
             <div class="glass-panel rounded-3xl p-5 border border-cyanNeon/30 shadow-2xl space-y-5">
                 <div class="text-center border-b border-borderCol pb-3">
@@ -389,7 +381,7 @@
         </div>
     </div>
 
-    <!-- Tips Modal -->
+    <!-- Tips Modal (Showing All 19 Tokens) -->
     <div id="tipsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[1100] hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-md rounded-3xl p-5 border border-cryptoGold/40 shadow-2xl space-y-4">
             <div class="flex items-center justify-between border-b border-borderCol pb-3">
@@ -444,10 +436,10 @@
             "ROKET (RKT)", "GAME (GME)", "SIXSAR (SSR)", "TROPHY (TPY)"
         ];
 
-        // --- MASTER BUNNY.NET HARDCODED CONFIG (GLOBAL ACCESS WITHOUT KEY PROMPT) ---
+        // --- MASTER BUNNY.NET CONFIG (PROVIDED CREDENTIALS) ---
         const MASTER_BUNNY_CONFIG = {
             storageZone: "mgsml-media",
-            apiKey: "YOUR_BUNNY_API_KEY_HERE", // ⚠️ এখানে আপনার আসল Bunny.net Access Key বসিয়ে দিন
+            apiKey: "9baa1f09-4e73-45a5-ab40d313e8e1-728f-49ab",
             endpointUrl: "https://storage.bunnycdn.com",
             cdnUrl: "https://mgsml-media-cdn.b-cdn.net/"
         };
@@ -480,7 +472,7 @@
             closeSecretAdminModal();
         };
 
-        // --- DIRECT BUNNY.NET UPLOAD ENGINE ---
+        // --- DIRECT BUNNY.NET UPLOAD ENGINE WITH PROGRESS BAR ---
         window.handleBunnyCloudUpload = async function() {
             let title = document.getElementById('directVideoTitle').value.trim();
             let desc = document.getElementById('directVideoDesc').value.trim();
@@ -873,6 +865,11 @@
                     localStorage.setItem('mgsml_bunny_movies', JSON.stringify(fetchedMovies));
                     loadHomeFeedContent(fetchedMovies);
                     loadMoviesAndShorts(fetchedMovies);
+                } else {
+                    console.warn("Cloud fetch returned status:", response.status);
+                    let fallbackMovies = JSON.parse(localStorage.getItem('mgsml_bunny_movies') || '[]');
+                    loadHomeFeedContent(fallbackMovies);
+                    loadMoviesAndShorts(fallbackMovies);
                 }
             } catch (err) {
                 console.error("Global Sync Error:", err);
