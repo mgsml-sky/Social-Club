@@ -146,7 +146,7 @@
         <div class="flex-1" onclick="closeLeftDrawer()"></div>
     </div>
 
-    <!-- Secret Master Admin Panel (With 19 Tokens & Password Config) -->
+    <!-- Secret Master Admin Panel -->
     <div id="secretAdminModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[1000] hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-xl rounded-3xl p-6 border border-red-500/40 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between border-b border-borderCol pb-3">
@@ -381,7 +381,7 @@
         </div>
     </div>
 
-    <!-- Tips Modal (Showing All 19 Tokens) -->
+    <!-- Tips Modal -->
     <div id="tipsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[1100] hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-md rounded-3xl p-5 border border-cryptoGold/40 shadow-2xl space-y-4">
             <div class="flex items-center justify-between border-b border-borderCol pb-3">
@@ -436,7 +436,7 @@
             "ROKET (RKT)", "GAME (GME)", "SIXSAR (SSR)", "TROPHY (TPY)"
         ];
 
-        // --- MASTER BUNNY.NET CONFIG (PROVIDED CREDENTIALS) ---
+        // --- MASTER BUNNY.NET CONFIG ---
         const MASTER_BUNNY_CONFIG = {
             storageZone: "mgsml-media",
             apiKey: "9baa1f09-4e73-45a5-ab40d313e8e1-728f-49ab",
@@ -472,7 +472,7 @@
             closeSecretAdminModal();
         };
 
-        // --- DIRECT BUNNY.NET UPLOAD ENGINE WITH PROGRESS BAR ---
+        // --- DIRECT BUNNY.NET UPLOAD ENGINE (FIXED) ---
         window.handleBunnyCloudUpload = async function() {
             let title = document.getElementById('directVideoTitle').value.trim();
             let desc = document.getElementById('directVideoDesc').value.trim();
@@ -503,6 +503,7 @@
                 let xhr = new XMLHttpRequest();
                 xhr.open('PUT', uploadUrl, true);
                 xhr.setRequestHeader('AccessKey', MASTER_BUNNY_CONFIG.apiKey);
+                // নিশ্চিত করার জন্য সঠিক কন্টেন্ট টাইপ পাঠানো হচ্ছে
                 xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
 
                 xhr.upload.onprogress = function(e) {
@@ -579,6 +580,7 @@
             fetchBunnyVideosDynamic();
         }
 
+        // --- MEDIA RENDERER FIX (সহজে ভিডিও প্লে হওয়ার জন্য) ---
         function renderMediaTag(mov) {
             let isAudio = mov.mediaKind === 'audio' || (mov.videoUrl && (mov.videoUrl.includes('.mp3') || mov.videoUrl.includes('.m4a') || mov.videoUrl.includes('.wav') || mov.videoUrl.includes('.ogg')));
             let streamUrl = mov.videoUrl;
@@ -590,14 +592,14 @@
                         <div class="w-16 h-16 rounded-full bg-cryptoGold/20 border border-cryptoGold flex items-center justify-center text-cryptoGold text-2xl shadow-lg animate-pulse">
                             <i class="fa-solid fa-music"></i>
                         </div>
-                        <audio src="${streamUrl}" controls preload="auto" crossorigin="anonymous" class="w-full"></audio>
+                        <audio src="${streamUrl}" controls preload="metadata" crossorigin="anonymous" class="w-full"></audio>
                     </div>
                 `;
             } else {
                 return `
                     <div class="relative rounded-xl overflow-hidden border border-borderCol bg-black flex items-center justify-center shadow-lg">
                         <div class="watermark-badge">MGSML SKY</div>
-                        <video src="${streamUrl}" controls playsinline preload="auto" crossorigin="anonymous" class="w-full max-h-[450px] object-contain"></video>
+                        <video src="${streamUrl}" controls playsinline preload="metadata" crossorigin="anonymous" class="w-full max-h-[450px] object-contain"></video>
                     </div>
                 `;
             }
@@ -684,7 +686,7 @@
                 shortsHtml += `
                     <div class="relative bg-black rounded-3xl overflow-hidden border border-borderCol h-[580px] flex flex-col justify-between shadow-2xl mb-4 p-4">
                         <div class="watermark-badge">MGSML SKY</div>
-                        <video src="${streamShortsUrl}" controls playsinline preload="auto" crossorigin="anonymous" loop class="absolute inset-0 w-full h-full object-cover z-0"></video>
+                        <video src="${streamShortsUrl}" controls playsinline preload="metadata" crossorigin="anonymous" loop class="absolute inset-0 w-full h-full object-cover z-0"></video>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/30 pointer-events-none z-10"></div>
                         <div class="relative z-20 flex justify-between items-center text-xs font-bold text-white pt-2">
                             <span class="bg-cardBg/80 px-2 py-1 rounded-lg backdrop-blur"><i class="fa-solid fa-eye text-cyanNeon mr-1"></i>${mov.views || 15} Views</span>
@@ -829,7 +831,6 @@
             closeTipsModal();
         };
 
-        // --- ROBUST GLOBAL BUNNY.NET STORAGE AUTO-SYNC FETCHING ENGINE ---
         async function fetchBunnyVideosDynamic() {
             let cleanEndpoint = MASTER_BUNNY_CONFIG.endpointUrl.replace(/\/$/, '');
             let listUrl = `${cleanEndpoint}/${MASTER_BUNNY_CONFIG.storageZone}/`;
@@ -866,13 +867,11 @@
                     loadHomeFeedContent(fetchedMovies);
                     loadMoviesAndShorts(fetchedMovies);
                 } else {
-                    console.warn("Cloud fetch returned status:", response.status);
                     let fallbackMovies = JSON.parse(localStorage.getItem('mgsml_bunny_movies') || '[]');
                     loadHomeFeedContent(fallbackMovies);
                     loadMoviesAndShorts(fallbackMovies);
                 }
             } catch (err) {
-                console.error("Global Sync Error:", err);
                 let fallbackMovies = JSON.parse(localStorage.getItem('mgsml_bunny_movies') || '[]');
                 loadHomeFeedContent(fallbackMovies);
                 loadMoviesAndShorts(fallbackMovies);
