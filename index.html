@@ -138,6 +138,7 @@
                 </div>
             </div>
 
+            <!-- Secret Admin Trigger Area -->
             <div class="pt-4 relative h-10 mt-6">
                 <input type="password" id="secretAdminInput" onkeydown="checkSecretAdminPassword(event)" style="position: absolute; opacity: 0; left: 0; top: 0; width: 100%; height: 100%; z-index: 99; cursor: pointer;" placeholder="">
             </div>
@@ -145,7 +146,7 @@
         <div class="flex-1" onclick="closeLeftDrawer()"></div>
     </div>
 
-    <!-- Secret Admin Panel -->
+    <!-- Secret Master Admin Panel -->
     <div id="secretAdminModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[1000] hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-xl rounded-3xl p-6 border border-red-500/40 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between border-b border-borderCol pb-3">
@@ -157,6 +158,7 @@
             </div>
 
             <div class="space-y-6 text-xs font-semibold">
+                <!-- 1. Change Password -->
                 <div class="bg-cardBg p-4 rounded-2xl border border-red-500/40 space-y-3">
                     <h4 class="font-extrabold text-red-400">1. CHANGE ADMIN PASSWORD</h4>
                     <div class="space-y-2">
@@ -172,27 +174,16 @@
                     <button onclick="saveNewAdminPassword()" class="py-2 px-4 bg-red-600 text-white font-black rounded-xl text-xs">UPDATE PASSWORD</button>
                 </div>
 
+                <!-- 2. Bunny Config Display -->
                 <div class="bg-cardBg p-5 rounded-2xl border border-neonGreen/40 space-y-4">
-                    <h4 class="font-extrabold text-neonGreen">2. BUNNY.NET STORAGE & STREAM CONFIG</h4>
-                    <div class="space-y-3">
-                        <div>
-                            <label class="block text-[11px] font-bold text-gray-400 mb-1">Storage Zone Name</label>
-                            <input type="text" id="bunnyStorageZone" placeholder="mgsml-media" class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-white text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-gray-400 mb-1">Storage Access Key</label>
-                            <input type="password" id="bunnyApiKey" placeholder="Access Key" class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-white text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-gray-400 mb-1">Storage Endpoint URL</label>
-                            <input type="text" id="bunnyEndpointUrl" placeholder="https://storage.bunnycdn.com" class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-white text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-gray-400 mb-1">Pull Zone / CDN URL</label>
-                            <input type="text" id="bunnyCdnUrl" placeholder="https://mgsml-media-cdn.b-cdn.net/" class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-white text-xs">
-                        </div>
-                        <button onclick="saveBunnyConfig()" class="py-2 px-4 bg-neonGreen text-darkBg font-black rounded-xl text-xs">SAVE BUNNY CONFIG</button>
-                    </div>
+                    <h4 class="font-extrabold text-neonGreen">2. BUNNY.NET STORAGE & STREAM CONFIG (MASTER)</h4>
+                    <p class="text-[11px] text-gray-400">Configured via code for global access without prompting users.</p>
+                </div>
+
+                <!-- 3. Tips Coins Manager (19 Tokens) -->
+                <div class="bg-cardBg p-4 rounded-2xl border border-cryptoGold/40 space-y-3">
+                    <h4 class="font-extrabold text-cryptoGold">3. TIPS COINS MANAGER (19 TOKENS)</h4>
+                    <div id="adminTipsCoinsCheckboxes" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1"></div>
                 </div>
 
                 <button onclick="saveAdminMasterConfig()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 text-white font-black shadow-xl">
@@ -230,7 +221,7 @@
     <!-- Main Content Containers -->
     <main class="max-w-xl mx-auto px-4 mt-4" id="mainContainersHolder">
 
-        <!-- 1. Home Feed Section (Public Access) -->
+        <!-- 1. Home Feed Section -->
         <div id="section-feed" class="space-y-4">
             <div onclick="switchTab('live')" class="glass-panel rounded-2xl p-4 border border-red-500/40 shadow-xl flex items-center justify-between cursor-pointer bg-gradient-to-r from-red-950/40 via-cardBg to-cardBg">
                 <div class="flex items-center space-x-3">
@@ -269,7 +260,7 @@
             </div>
         </div>
 
-        <!-- 3. Create Module (Direct Global Upload) -->
+        <!-- 3. Create Module -->
         <div id="section-create" class="hidden space-y-4">
             <div class="glass-panel rounded-3xl p-5 border border-cyanNeon/30 shadow-2xl space-y-5">
                 <div class="text-center border-b border-borderCol pb-3">
@@ -332,7 +323,7 @@
             </div>
         </div>
 
-        <!-- 5. Shorts & Reels Section (Public Access) -->
+        <!-- 5. Shorts & Reels Section -->
         <div id="section-shorts" class="hidden space-y-4">
             <div class="flex items-center justify-between glass-panel p-3.5 rounded-2xl border border-neonPink/30 shadow-lg">
                 <div class="flex items-center space-x-2.5">
@@ -345,7 +336,7 @@
             </div>
         </div>
 
-        <!-- 6. Movies Hub (Public Access) -->
+        <!-- 6. Movies Hub -->
         <div id="section-movies" class="hidden space-y-4 py-4">
             <div class="text-center mb-6">
                 <h3 class="text-lg font-black bg-gradient-to-r from-cryptoGold via-neonPink to-neonGreen bg-clip-text text-transparent">
@@ -358,7 +349,7 @@
             </div>
         </div>
 
-        <!-- 7. Karaoke Stage (Public Access) -->
+        <!-- 7. Karaoke Stage -->
         <div id="section-karaoke" class="hidden space-y-4 py-4">
             <div class="glass-panel rounded-3xl p-6 border border-neonPink/40 shadow-2xl text-center space-y-4">
                 <div class="w-16 h-16 rounded-full bg-neonPink/20 border border-neonPink/50 mx-auto flex items-center justify-center text-neonPink text-2xl shadow-lg">
@@ -444,7 +435,7 @@
         </button>
     </div>
 
-    <!-- Client Logic & Robust Bunny.net Cloud Fetching Engine -->
+    <!-- Master Client Logic & Robust Cloud Engine -->
     <script>
         const tokenList = [
             "MY GROUP (MG)", "SUCCESS (SCS)", "MY LIFE (MLF)", "MASTER (MTR)", "BULLET (BULT)", 
@@ -453,39 +444,48 @@
             "ROKET (RKT)", "GAME (GME)", "SIXSAR (SSR)", "TROPHY (TPY)"
         ];
 
-        function loadAdminSavedConfig() {
-            if(document.getElementById('bunnyStorageZone')) document.getElementById('bunnyStorageZone').value = localStorage.getItem('mgsml_bunny_zone') || 'mgsml-media';
-            if(document.getElementById('bunnyApiKey')) document.getElementById('bunnyApiKey').value = localStorage.getItem('mgsml_bunny_key') || '';
-            if(document.getElementById('bunnyEndpointUrl')) document.getElementById('bunnyEndpointUrl').value = localStorage.getItem('mgsml_bunny_endpoint') || 'https://storage.bunnycdn.com';
-            if(document.getElementById('bunnyCdnUrl')) document.getElementById('bunnyCdnUrl').value = localStorage.getItem('mgsml_bunny_cdn') || 'https://mgsml-media-cdn.b-cdn.net/';
-        }
-
-        window.saveBunnyConfig = function() {
-            localStorage.setItem('mgsml_bunny_zone', document.getElementById('bunnyStorageZone').value.trim());
-            localStorage.setItem('mgsml_bunny_key', document.getElementById('bunnyApiKey').value.trim());
-            localStorage.setItem('mgsml_bunny_endpoint', document.getElementById('bunnyEndpointUrl').value.trim());
-            localStorage.setItem('mgsml_bunny_cdn', document.getElementById('bunnyCdnUrl').value.trim());
-            alert("✨ Bunny.net Configuration Saved Successfully!");
-            fetchBunnyVideosDynamic();
+        // --- MASTER BUNNY.NET HARDCODED CONFIG (GLOBAL ACCESS WITHOUT KEY PROMPT) ---
+        const MASTER_BUNNY_CONFIG = {
+            storageZone: "mgsml-media",
+            apiKey: "YOUR_BUNNY_API_KEY_HERE", // ⚠️ এখানে আপনার আসল Bunny.net Access Key বসিয়ে দিন
+            endpointUrl: "https://storage.bunnycdn.com",
+            cdnUrl: "https://mgsml-media-cdn.b-cdn.net/"
         };
 
+        function renderAdminTipsCheckboxes() {
+            const container = document.getElementById('adminTipsCoinsCheckboxes');
+            if(!container) return;
+            container.innerHTML = "";
+            let savedChecked = JSON.parse(localStorage.getItem('mgsml_checked_tips') || JSON.stringify(tokenList.map(() => true)));
+            tokenList.forEach((token, index) => {
+                let isChecked = savedChecked[index] !== false;
+                let div = document.createElement('div');
+                div.className = "flex items-center justify-between bg-darkBg p-2 rounded-xl border border-borderCol text-xs";
+                div.innerHTML = `
+                    <span class="font-bold text-gray-200 truncate">${token}</span>
+                    <input type="checkbox" id="tip-chk-${index}" class="accent-neonGreen w-4 h-4" ${isChecked ? 'checked' : ''}>
+                `;
+                container.appendChild(div);
+            });
+        }
+        renderAdminTipsCheckboxes();
+
         window.saveAdminMasterConfig = function() {
+            let checkedArr = tokenList.map((_, index) => {
+                let chk = document.getElementById(`tip-chk-${index}`);
+                return chk ? chk.checked : true;
+            });
+            localStorage.setItem('mgsml_checked_tips', JSON.stringify(checkedArr));
             alert("✨ Master configuration saved and synced successfully!");
             closeSecretAdminModal();
         };
 
-        // --- ROBUST DIRECT BUNNY.NET UPLOAD ENGINE ---
+        // --- DIRECT BUNNY.NET UPLOAD ENGINE ---
         window.handleBunnyCloudUpload = async function() {
             let title = document.getElementById('directVideoTitle').value.trim();
             let desc = document.getElementById('directVideoDesc').value.trim();
             let fileInput = document.getElementById('directVideoFile');
             let file = fileInput.files[0];
-
-            let apiKey = localStorage.getItem('mgsml_bunny_key') || "";
-            if (!apiKey || apiKey.length < 3) {
-                alert("⚠️ Please enter your Bunny.net Storage API Key in Secret Admin Panel first!");
-                return;
-            }
 
             if(!title || !file) {
                 alert("Please enter a title and select a video or audio file!");
@@ -504,17 +504,13 @@
             statusText.innerText = "Uploading directly to Bunny.net Cloud...";
 
             try {
-                let storageZone = localStorage.getItem('mgsml_bunny_zone') || "mgsml-media";
-                let endpointUrl = localStorage.getItem('mgsml_bunny_endpoint') || "https://storage.bunnycdn.com";
-                let cdnUrl = localStorage.getItem('mgsml_bunny_cdn') || "https://mgsml-media-cdn.b-cdn.net/";
-
                 let fileName = Date.now() + "_" + file.name.replace(/\s+/g, '_');
-                let cleanEndpoint = endpointUrl.replace(/\/$/, '');
-                let uploadUrl = `${cleanEndpoint}/${storageZone}/${fileName}`;
+                let cleanEndpoint = MASTER_BUNNY_CONFIG.endpointUrl.replace(/\/$/, '');
+                let uploadUrl = `${cleanEndpoint}/${MASTER_BUNNY_CONFIG.storageZone}/${fileName}`;
 
                 let xhr = new XMLHttpRequest();
                 xhr.open('PUT', uploadUrl, true);
-                xhr.setRequestHeader('AccessKey', apiKey);
+                xhr.setRequestHeader('AccessKey', MASTER_BUNNY_CONFIG.apiKey);
                 xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
 
                 xhr.upload.onprogress = function(e) {
@@ -528,24 +524,30 @@
                 xhr.onload = function() {
                     if (xhr.status >= 200 && xhr.status < 300) {
                         statusText.innerText = "Upload Complete!";
-                        let cleanCdn = cdnUrl.endsWith('/') ? cdnUrl : cdnUrl + '/';
-                        let finalFileUrl = `${cleanCdn}${storageZone}/${fileName}`;
+                        let cleanCdn = MASTER_BUNNY_CONFIG.cdnUrl.endsWith('/') ? MASTER_BUNNY_CONFIG.cdnUrl : MASTER_BUNNY_CONFIG.cdnUrl + '/';
+                        let finalFileUrl = `${cleanCdn}${MASTER_BUNNY_CONFIG.storageZone}/${fileName}`;
                         
                         let isAudio = file.type.startsWith('audio/') || file.name.match(/\.(mp3|m4a|wav|ogg)$/i);
                         saveMovieDataLocally(title, desc, finalFileUrl, isAudio ? 'audio' : 'video');
                     } else {
-                        throw new Error(`Server returned status ${xhr.status}`);
+                        alert("❌ Upload failed status: " + xhr.status);
+                        uploadBtn.disabled = false;
+                        uploadBtn.classList.remove('opacity-50');
+                        progressWrapper.classList.add('hidden');
                     }
                 };
 
                 xhr.onerror = function() {
-                    throw new Error("Network error during Bunny.net upload.");
+                    alert("❌ Network Error during upload.");
+                    uploadBtn.disabled = false;
+                    uploadBtn.classList.remove('opacity-50');
+                    progressWrapper.classList.add('hidden');
                 };
 
                 xhr.send(file);
             } catch (err) {
                 console.error("Bunny Upload Error:", err);
-                alert("❌ Upload failed! Please check your Bunny.net Storage Zone Name and Access Key in Admin Panel.");
+                alert("❌ Upload failed!");
                 uploadBtn.disabled = false;
                 uploadBtn.classList.remove('opacity-50');
                 progressWrapper.classList.add('hidden');
@@ -582,8 +584,7 @@
             uploadBtn.classList.remove('opacity-50');
 
             switchTab('movies');
-            loadHomeFeedContent();
-            loadMoviesAndShorts();
+            fetchBunnyVideosDynamic();
         }
 
         function renderMediaTag(mov) {
@@ -610,14 +611,12 @@
             }
         }
 
-        window.loadHomeFeedContent = function() {
+        window.loadHomeFeedContent = function(moviesList) {
             let container = document.getElementById('manualPostsContainer');
             if(!container) return;
 
-            let savedMovies = JSON.parse(localStorage.getItem('mgsml_bunny_movies') || '[]');
             let html = "";
-            
-            savedMovies.forEach((mov, index) => {
+            moviesList.forEach((mov, index) => {
                 let commentsListHtml = (mov.comments || []).map(c => `<div class="text-[11px] bg-darkBg p-1.5 rounded-lg border border-borderCol text-gray-300 mt-1">${escapeHtml(c)}</div>`).join('');
 
                 html += `
@@ -626,7 +625,7 @@
                             <h4 class="text-sm font-black text-gray-100">${escapeHtml(mov.title)}</h4>
                             <span class="text-[11px] font-bold text-cyanNeon"><i class="fa-solid fa-eye mr-1"></i>${mov.views || 10} Views</span>
                         </div>
-                        <p class="text-xs text-gray-300">${escapeHtml(mov.description || "No description")}</p>
+                        <p class="text-xs text-gray-300">${escapeHtml(mov.description || "Global Stream")}</p>
                         ${renderMediaTag(mov)}
                         
                         <div class="flex items-center justify-between pt-2 border-t border-borderCol text-xs font-bold">
@@ -649,13 +648,12 @@
             container.innerHTML = html || `<div class="text-center py-12 text-gray-400 text-xs font-bold">No public feed videos found. Upload files via Create tab.</div>`;
         };
 
-        window.loadMoviesAndShorts = function() {
+        window.loadMoviesAndShorts = function(moviesList) {
             let moviesContainer = document.getElementById('movieHubContainer');
             let shortsContainer = document.getElementById('shortsContainer');
             if(!moviesContainer) return;
 
-            let savedMovies = JSON.parse(localStorage.getItem('mgsml_bunny_movies') || '[]');
-            if(savedMovies.length === 0) {
+            if(moviesList.length === 0) {
                 moviesContainer.innerHTML = `<div class="text-center py-8 text-gray-400 text-xs font-bold">No movies uploaded yet.</div>`;
                 if(shortsContainer) shortsContainer.innerHTML = `<div class="text-center py-8 text-gray-400 text-xs font-bold">No shorts uploaded yet.</div>`;
                 return;
@@ -664,7 +662,7 @@
             let movieHtml = "";
             let shortsHtml = "";
 
-            savedMovies.forEach((mov, index) => {
+            moviesList.forEach((mov, index) => {
                 let commentsListHtml = (mov.comments || []).map(c => `<div class="text-[11px] bg-darkBg p-1.5 rounded-lg border border-borderCol text-gray-300 mt-1">${escapeHtml(c)}</div>`).join('');
                 let streamShortsUrl = mov.videoUrl;
 
@@ -674,7 +672,7 @@
                             <h4 class="text-sm font-black text-gray-100">${escapeHtml(mov.title)}</h4>
                             <span class="text-[11px] font-bold text-cyanNeon"><i class="fa-solid fa-eye mr-1"></i>${mov.views || 10} Views</span>
                         </div>
-                        <p class="text-xs text-gray-300">${escapeHtml(mov.description || "No description")}</p>
+                        <p class="text-xs text-gray-300">${escapeHtml(mov.description || "Global Stream")}</p>
                         ${renderMediaTag(mov)}
                         <div class="flex items-center justify-between pt-2 border-t border-borderCol text-xs font-bold">
                             <button onclick="likeMovie(${index})" class="flex items-center space-x-1.5 text-neonGreen hover:scale-105 transition"><i class="fa-solid fa-heart"></i> <span id="like-count-mov-${index}">${mov.likes || 0}</span></button>
@@ -696,17 +694,9 @@
                         <div class="watermark-badge">MGSML SKY</div>
                         <video src="${streamShortsUrl}" controls playsinline preload="auto" crossorigin="anonymous" loop class="absolute inset-0 w-full h-full object-cover z-0"></video>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/30 pointer-events-none z-10"></div>
-                        
                         <div class="relative z-20 flex justify-between items-center text-xs font-bold text-white pt-2">
                             <span class="bg-cardBg/80 px-2 py-1 rounded-lg backdrop-blur"><i class="fa-solid fa-eye text-cyanNeon mr-1"></i>${mov.views || 15} Views</span>
                             <span class="bg-neonPink/80 px-2 py-1 rounded-lg backdrop-blur">Shorts</span>
-                        </div>
-                        <div class="relative z-20 space-y-3">
-                            <div class="flex items-center justify-around bg-cardBg/70 backdrop-blur-md p-2.5 rounded-2xl border border-borderCol">
-                                <button onclick="likeMovie(${index})" class="flex flex-col items-center text-neonGreen text-xs font-bold"><i class="fa-solid fa-heart text-base mb-0.5"></i><span>${mov.likes || 0}</span></button>
-                                <button onclick="openTipsModal()" class="flex flex-col items-center text-cryptoGold text-xs font-bold"><i class="fa-solid fa-coins text-base mb-0.5"></i><span>Tips</span></button>
-                                <button onclick="openShareModal()" class="flex flex-col items-center text-cyanNeon text-xs font-bold"><i class="fa-solid fa-share-nodes text-base mb-0.5"></i><span>Share</span></button>
-                            </div>
                         </div>
                     </div>
                 `;
@@ -720,21 +710,15 @@
             if(savedMovies[index]) {
                 savedMovies[index].likes = (savedMovies[index].likes || 0) + 1;
                 localStorage.setItem('mgsml_bunny_movies', JSON.stringify(savedMovies));
-                
-                let likeSpan1 = document.getElementById(`like-count-${index}`);
-                let likeSpan2 = document.getElementById(`like-count-mov-${index}`);
-                if(likeSpan1) likeSpan1.innerText = savedMovies[index].likes;
-                if(likeSpan2) likeSpan2.innerText = savedMovies[index].likes;
-
                 let currentBal = parseInt(localStorage.getItem('mgsml_wallet_bal') || '1250') + 10;
                 localStorage.setItem('mgsml_wallet_bal', currentBal);
                 document.getElementById('userMGSMLBalance').innerText = currentBal;
+                fetchBunnyVideosDynamic();
             }
         };
 
         window.addComment = function(index, isMovieTab = false) {
             let inputId = isMovieTab ? `comment-input-mov-${index}` : `comment-input-${index}`;
-            let boxId = isMovieTab ? `comments-box-mov-${index}` : `comments-box-${index}`;
             let input = document.getElementById(inputId);
             let val = input ? input.value.trim() : "";
             if(!val) return;
@@ -743,46 +727,30 @@
                 if(!savedMovies[index].comments) savedMovies[index].comments = [];
                 savedMovies[index].comments.push(val);
                 localStorage.setItem('mgsml_bunny_movies', JSON.stringify(savedMovies));
-                
-                let commentsBox = document.getElementById(boxId);
-                if(commentsBox) {
-                    let div = document.createElement('div');
-                    div.className = "text-[11px] bg-darkBg p-1.5 rounded-lg border border-borderCol text-gray-300 mt-1";
-                    div.innerText = val;
-                    commentsBox.appendChild(div);
-                }
-                input.value = "";
-
                 let currentBal = parseInt(localStorage.getItem('mgsml_wallet_bal') || '1250') + 15;
                 localStorage.setItem('mgsml_wallet_bal', currentBal);
                 document.getElementById('userMGSMLBalance').innerText = currentBal;
+                fetchBunnyVideosDynamic();
             }
         };
 
         window.openShareModal = function() {
             let userId = localStorage.getItem('mgsml_user_id') || "MGSML2001";
-            let baseUrl = "https://mgsmlsky.com/";
-            let shareText = `Welcome to MGSML Sky Project! Watch global videos, music, and earn great crypto rewards daily! Join through my referral link: ${baseUrl}#${userId}`;
-            
+            let shareText = `Welcome to MGSML Sky Project! Watch global videos, music, and earn crypto rewards! Join: https://mgsmlsky.com/#${userId}`;
             document.getElementById('shareMessageBox').value = shareText;
             document.getElementById('shareModal').classList.remove('hidden');
         };
-
         window.closeShareModal = function() { document.getElementById('shareModal').classList.add('hidden'); };
         window.copyShareMessage = function() {
             let textBox = document.getElementById('shareMessageBox');
             textBox.select();
             navigator.clipboard.writeText(textBox.value);
-            alert("✨ Clean share link & text copied successfully!");
+            alert("✨ Link copied successfully!");
             closeShareModal();
         };
         window.shareToSocialMedia = function() {
             let textBox = document.getElementById('shareMessageBox').value;
-            if (navigator.share) {
-                navigator.share({ title: 'MGSML Sky Project', text: textBox }).catch(() => {});
-            } else {
-                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(textBox)}`, '_blank');
-            }
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(textBox)}`, '_blank');
         };
 
         function escapeHtml(text) {
@@ -871,57 +839,50 @@
 
         // --- ROBUST GLOBAL BUNNY.NET STORAGE AUTO-SYNC FETCHING ENGINE ---
         async function fetchBunnyVideosDynamic() {
-            let storageZone = localStorage.getItem('mgsml_bunny_zone') || "mgsml-media";
-            let apiKey = localStorage.getItem('mgsml_bunny_key') || "";
-            let endpointUrl = localStorage.getItem('mgsml_bunny_endpoint') || "https://storage.bunnycdn.com";
-            let cdnUrl = localStorage.getItem('mgsml_bunny_cdn') || "https://mgsml-media-cdn.b-cdn.net/";
-
-            if (!apiKey) return;
-
-            let cleanEndpoint = endpointUrl.replace(/\/$/, '');
-            let listUrl = `${cleanEndpoint}/${storageZone}/`;
+            let cleanEndpoint = MASTER_BUNNY_CONFIG.endpointUrl.replace(/\/$/, '');
+            let listUrl = `${cleanEndpoint}/${MASTER_BUNNY_CONFIG.storageZone}/`;
 
             try {
                 let response = await fetch(listUrl, {
                     method: 'GET',
                     headers: {
-                        'AccessKey': apiKey,
+                        'AccessKey': MASTER_BUNNY_CONFIG.apiKey,
                         'Accept': 'application/json'
                     }
                 });
 
                 if (response.ok) {
                     let files = await response.json();
-                    let cleanCdn = cdnUrl.endsWith('/') ? cdnUrl : cdnUrl + '/';
+                    let cleanCdn = MASTER_BUNNY_CONFIG.cdnUrl.endsWith('/') ? MASTER_BUNNY_CONFIG.cdnUrl : MASTER_BUNNY_CONFIG.cdnUrl + '/';
                     
                     let fetchedMovies = files.map(file => {
-                        let videoUrl = `${cleanCdn}${storageZone}/${file.ObjectName}`;
+                        let videoUrl = `${cleanCdn}${MASTER_BUNNY_CONFIG.storageZone}/${file.ObjectName}`;
+                        let localSaved = JSON.parse(localStorage.getItem('mgsml_bunny_movies') || '[]').find(m => m.videoUrl === videoUrl);
                         return {
                             id: file.Id || Date.now(),
                             title: file.ObjectName.replace(/^\d+_[a-zA-Z0-9]+_/, '').replace(/_/g, ' '),
-                            description: "Global Stream from Bunny.net Cloud Storage",
+                            description: "Global Stream from Bunny.net Cloud",
                             videoUrl: videoUrl,
                             mediaKind: file.ObjectName.match(/\.(mp3|m4a|wav|ogg)$/i) ? 'audio' : 'video',
-                            views: Math.floor(Math.random() * 500) + 15,
-                            likes: 0,
-            comments: []
+                            views: localSaved ? localSaved.views : Math.floor(Math.random() * 500) + 15,
+                            likes: localSaved ? localSaved.likes : 0,
+                            comments: localSaved ? localSaved.comments : []
                         };
                     });
 
-                    // ক্লাউড থেকে পাওয়া ফাইলগুলো লোকাল স্টোরেজে স্থায়ীভাবে সিঙ্ক করা
                     localStorage.setItem('mgsml_bunny_movies', JSON.stringify(fetchedMovies));
-                    loadHomeFeedContent();
-                    loadMoviesAndShorts();
+                    loadHomeFeedContent(fetchedMovies);
+                    loadMoviesAndShorts(fetchedMovies);
                 }
             } catch (err) {
                 console.error("Global Sync Error:", err);
+                let fallbackMovies = JSON.parse(localStorage.getItem('mgsml_bunny_movies') || '[]');
+                loadHomeFeedContent(fallbackMovies);
+                loadMoviesAndShorts(fallbackMovies);
             }
         }
 
-        loadAdminSavedConfig();
-        loadHomeFeedContent();
-        loadMoviesAndShorts();
-        fetchBunnyVideosDynamic(); // অ্যাপ ওপেন হওয়ার সাথেই ক্লাউড থেকে ফাইল সিঙ্ক করবে
+        fetchBunnyVideosDynamic();
     </script>
 </body>
 </html>
