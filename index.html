@@ -472,7 +472,7 @@
             closeSecretAdminModal();
         };
 
-        // --- DIRECT BUNNY.NET UPLOAD ENGINE (FIXED) ---
+        // --- DIRECT BUNNY.NET UPLOAD ENGINE ---
         window.handleBunnyCloudUpload = async function() {
             let title = document.getElementById('directVideoTitle').value.trim();
             let desc = document.getElementById('directVideoDesc').value.trim();
@@ -503,7 +503,6 @@
                 let xhr = new XMLHttpRequest();
                 xhr.open('PUT', uploadUrl, true);
                 xhr.setRequestHeader('AccessKey', MASTER_BUNNY_CONFIG.apiKey);
-                // নিশ্চিত করার জন্য সঠিক কন্টেন্ট টাইপ পাঠানো হচ্ছে
                 xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
 
                 xhr.upload.onprogress = function(e) {
@@ -580,7 +579,7 @@
             fetchBunnyVideosDynamic();
         }
 
-        // --- MEDIA RENDERER FIX (সহজে ভিডিও প্লে হওয়ার জন্য) ---
+        // --- FIXED MEDIA RENDERER FOR MOBILE PLAYING ---
         function renderMediaTag(mov) {
             let isAudio = mov.mediaKind === 'audio' || (mov.videoUrl && (mov.videoUrl.includes('.mp3') || mov.videoUrl.includes('.m4a') || mov.videoUrl.includes('.wav') || mov.videoUrl.includes('.ogg')));
             let streamUrl = mov.videoUrl;
@@ -592,7 +591,11 @@
                         <div class="w-16 h-16 rounded-full bg-cryptoGold/20 border border-cryptoGold flex items-center justify-center text-cryptoGold text-2xl shadow-lg animate-pulse">
                             <i class="fa-solid fa-music"></i>
                         </div>
-                        <audio src="${streamUrl}" controls preload="metadata" crossorigin="anonymous" class="w-full"></audio>
+                        <audio controls preload="auto" crossorigin="anonymous" class="w-full" onloadedmetadata="this.load()">
+                            <source src="${streamUrl}" type="audio/mp4">
+                            <source src="${streamUrl}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
                     </div>
                 `;
             } else {
