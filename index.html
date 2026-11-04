@@ -232,7 +232,7 @@
             </div>
             
             <div id="manualPostsContainer" class="space-y-4">
-                <div class="text-center py-12 text-gray-400 text-xs font-bold">Syncing with Bunny.net Cloud...</div>
+                <div class="text-center py-12 text-gray-400 text-xs font-bold">Syncing with Bunny.net Stream Library...</div>
             </div>
         </div>
 
@@ -252,15 +252,15 @@
             </div>
         </div>
 
-        <!-- 3. Create Module (Direct Bunny.net Cloud Upload with Progress Bar) -->
+        <!-- 3. Create Module (Bunny.net Stream Library Upload) -->
         <div id="section-create" class="hidden space-y-4">
             <div class="glass-panel rounded-3xl p-5 border border-cyanNeon/30 shadow-2xl space-y-5">
                 <div class="text-center border-b border-borderCol pb-3">
                     <h3 class="text-sm font-black text-white flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-cloud-arrow-up text-cyanNeon"></i>
-                        <span>MGSML SKY CREATOR STUDIO (BUNNY.NET)</span>
+                        <span>MGSML STREAM STUDIO (BUNNY.NET)</span>
                     </h3>
-                    <p class="text-[11px] font-bold text-gray-400 mt-1">Upload directly to Bunny.net Cloud storage!</p>
+                    <p class="text-[11px] font-bold text-gray-400 mt-1">Upload directly to Bunny.net Stream Library!</p>
                 </div>
 
                 <div class="space-y-3">
@@ -273,13 +273,13 @@
                         <textarea id="directVideoDesc" rows="2" placeholder="Write description..." class="w-full bg-darkBg border border-borderCol rounded-xl p-3 text-xs text-white resize-none"></textarea>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-300 mb-1">Select Video / Audio File (.mp4, .mp3, .m4a)</label>
+                        <label class="block text-xs font-bold text-gray-300 mb-1">Select Video / Audio File</label>
                         <input type="file" id="directVideoFile" accept="video/*,audio/*" class="w-full bg-darkBg border border-borderCol rounded-xl p-2 text-xs text-gray-300 mb-2">
                     </div>
 
                     <div id="uploadProgressWrapper" class="hidden space-y-2 bg-darkBg p-3 rounded-2xl border border-borderCol">
                         <div class="flex justify-between text-xs font-extrabold">
-                            <span id="uploadStatusText" class="text-cyanNeon">Uploading to Bunny.net Cloud...</span>
+                            <span id="uploadStatusText" class="text-cyanNeon">Creating stream video entry...</span>
                             <span id="uploadPercentage" class="text-neonGreen">0%</span>
                         </div>
                         <div class="w-full bg-cardBg rounded-full h-3 overflow-hidden border border-borderCol">
@@ -287,8 +287,8 @@
                         </div>
                     </div>
 
-                    <button type="button" id="uploadBtnElement" onclick="handleBunnyCloudUpload()" class="w-full py-3 bg-gradient-to-r from-neonGreen to-cyanNeon text-darkBg font-black rounded-xl text-xs shadow-lg">
-                        UPLOAD TO BUNNY.NET CLOUD 🚀
+                    <button type="button" id="uploadBtnElement" onclick="handleBunnyStreamUpload()" class="w-full py-3 bg-gradient-to-r from-neonGreen to-cyanNeon text-darkBg font-black rounded-xl text-xs shadow-lg">
+                        UPLOAD TO STREAM LIBRARY 🚀
                     </button>
                 </div>
             </div>
@@ -427,7 +427,7 @@
         </button>
     </div>
 
-    <!-- Master Client Logic & Robust Cloud Engine -->
+    <!-- Master Client Logic & Stream Engine -->
     <script>
         const tokenList = [
             "MY GROUP (MG)", "SUCCESS (SCS)", "MY LIFE (MLF)", "MASTER (MTR)", "BULLET (BULT)", 
@@ -436,12 +436,11 @@
             "ROKET (RKT)", "GAME (GME)", "SIXSAR (SSR)", "TROPHY (TPY)"
         ];
 
-        // --- MASTER BUNNY.NET CONFIG ---
-        const MASTER_BUNNY_CONFIG = {
-            storageZone: "mgsml-media",
-            apiKey: "9baa1f09-4e73-45a5-ab40d313e8e1-728f-49ab",
-            endpointUrl: "https://storage.bunnycdn.com",
-            cdnUrl: "https://mgsml-media-cdn.b-cdn.net/"
+        // --- MASTER BUNNY STREAM CONFIG ---
+        const MASTER_STREAM_CONFIG = {
+            libraryId: "799000",
+            apiKey: "8826df2c-1671-43b1-91f719e8614b-628a-4400",
+            cdnHostname: "vz-a6fb0e3a-e9f.b-cdn.net"
         };
 
         function renderAdminTipsCheckboxes() {
@@ -472,8 +471,8 @@
             closeSecretAdminModal();
         };
 
-        // --- DIRECT BUNNY.NET UPLOAD ENGINE ---
-        window.handleBunnyCloudUpload = async function() {
+        // --- BUNNY STREAM UPLOAD ENGINE (TUS / API UPLOAD) ---
+        window.handleBunnyStreamUpload = async function() {
             let title = document.getElementById('directVideoTitle').value.trim();
             let desc = document.getElementById('directVideoDesc').value.trim();
             let fileInput = document.getElementById('directVideoFile');
@@ -493,21 +492,38 @@
             progressWrapper.classList.remove('hidden');
             uploadBtn.disabled = true;
             uploadBtn.classList.add('opacity-50');
-            statusText.innerText = "Uploading directly to Bunny.net Cloud...";
+            statusText.innerText = "Creating video entry in Stream Library...";
 
             try {
-                let fileName = Date.now() + "_" + file.name.replace(/\s+/g, '_');
-                let cleanEndpoint = MASTER_BUNNY_CONFIG.endpointUrl.replace(/\/$/, '');
-                let uploadUrl = `${cleanEndpoint}/${MASTER_BUNNY_CONFIG.storageZone}/${fileName}`;
+                // Step 1: Create Video Object via Bunny Stream API
+                let createUrl = `https://video.bunnycdn.com/library/${MASTER_STREAM_CONFIG.libraryId}/videos`;
+                let createRes = await fetch(createUrl, {
+                    method: 'POST',
+                    headers: {
+                        'AccessKey': MASTER_STREAM_CONFIG.apiKey,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ title: title })
+                });
 
+                if (!createRes.ok) throw new Error("Failed to create video entry.");
+                let videoData = await createRes.json();
+                let videoId = videoData.guid;
+
+                statusText.innerText = "Uploading file to Stream Library...";
+                progressBar.style.width = "30%";
+                progressPercent.innerText = "30%";
+
+                // Step 2: Upload Binary File to the created video ID
+                let uploadUrl = `https://video.bunnycdn.com/library/${MASTER_STREAM_CONFIG.libraryId}/videos/${videoId}`;
                 let xhr = new XMLHttpRequest();
                 xhr.open('PUT', uploadUrl, true);
-                xhr.setRequestHeader('AccessKey', MASTER_BUNNY_CONFIG.apiKey);
-                xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+                xhr.setRequestHeader('AccessKey', MASTER_STREAM_CONFIG.apiKey);
 
                 xhr.upload.onprogress = function(e) {
                     if (e.lengthComputable) {
-                        let percent = Math.round((e.loaded / e.total) * 100);
+                        let percent = Math.round(30 + ((e.loaded / e.total) * 70));
                         progressBar.style.width = percent + '%';
                         progressPercent.innerText = percent + '%';
                     }
@@ -516,11 +532,13 @@
                 xhr.onload = function() {
                     if (xhr.status >= 200 && xhr.status < 300) {
                         statusText.innerText = "Upload Complete!";
-                        let cleanCdn = MASTER_BUNNY_CONFIG.cdnUrl.endsWith('/') ? MASTER_BUNNY_CONFIG.cdnUrl : MASTER_BUNNY_CONFIG.cdnUrl + '/';
-                        let finalFileUrl = `${cleanCdn}${MASTER_BUNNY_CONFIG.storageZone}/${fileName}`;
-                        
                         let isAudio = file.type.startsWith('audio/') || file.name.match(/\.(mp3|m4a|wav|ogg)$/i);
-                        saveMovieDataLocally(title, desc, finalFileUrl, isAudio ? 'audio' : 'video');
+                        
+                        // Bunny Stream Playback Embed / Direct URL
+                        let streamEmbedUrl = `https://${MASTER_STREAM_CONFIG.cdnHostname}/${videoId}/playlist.m3u8`;
+                        let fallbackMp4Url = `https://${MASTER_STREAM_CONFIG.cdnHostname}/${videoId}/play_720p.mp4`;
+
+                        saveMovieDataLocally(title, desc, streamEmbedUrl, fallbackMp4Url, isAudio ? 'audio' : 'video', videoId);
                     } else {
                         alert("❌ Upload failed status: " + xhr.status);
                         uploadBtn.disabled = false;
@@ -530,7 +548,7 @@
                 };
 
                 xhr.onerror = function() {
-                    alert("❌ Network Error during upload.");
+                    alert("❌ Network Error during stream upload.");
                     uploadBtn.disabled = false;
                     uploadBtn.classList.remove('opacity-50');
                     progressWrapper.classList.add('hidden');
@@ -538,34 +556,35 @@
 
                 xhr.send(file);
             } catch (err) {
-                console.error("Bunny Upload Error:", err);
-                alert("❌ Upload failed!");
+                console.error("Stream Upload Error:", err);
+                alert("❌ Stream upload failed!");
                 uploadBtn.disabled = false;
                 uploadBtn.classList.remove('opacity-50');
                 progressWrapper.classList.add('hidden');
             }
         };
 
-        function saveMovieDataLocally(title, desc, videoUrl, mediaKind) {
-            let savedMovies = JSON.parse(localStorage.getItem('mgsml_bunny_movies') || '[]');
+        function saveMovieDataLocally(title, desc, streamUrl, fallbackUrl, mediaKind, videoId) {
+            let savedMovies = JSON.parse(localStorage.getItem('mgsml_stream_movies') || '[]');
             let newMovie = { 
-                id: Date.now(),
+                id: videoId || Date.now(),
                 title, 
                 description: desc, 
-                videoUrl, 
+                videoUrl: streamUrl, 
+                fallbackUrl: fallbackUrl,
                 mediaKind: mediaKind || 'video',
                 views: Math.floor(Math.random() * 500) + 15,
                 likes: 0,
                 comments: []
             };
             savedMovies.unshift(newMovie);
-            localStorage.setItem('mgsml_bunny_movies', JSON.stringify(savedMovies));
+            localStorage.setItem('mgsml_stream_movies', JSON.stringify(savedMovies));
 
             let currentBal = parseInt(localStorage.getItem('mgsml_wallet_bal') || '1250') + 100;
             localStorage.setItem('mgsml_wallet_bal', currentBal);
             document.getElementById('userMGSMLBalance').innerText = currentBal;
 
-            alert("🎉 Success! File uploaded successfully to Bunny.net Cloud & +100 MGSML Bonus Claimed!");
+            alert("🎉 Success! Uploaded to Bunny.net Stream Library & +100 MGSML Bonus Claimed!");
             
             document.getElementById('directVideoTitle').value = "";
             document.getElementById('directVideoDesc').value = "";
@@ -576,24 +595,25 @@
             uploadBtn.classList.remove('opacity-50');
 
             switchTab('movies');
-            fetchBunnyVideosDynamic();
+            fetchStreamVideosDynamic();
         }
 
-        // --- FIXED MEDIA RENDERER FOR MOBILE PLAYING ---
+        // --- STREAM MEDIA RENDERER (SMOOTH PLAYBACK) ---
         function renderMediaTag(mov) {
-            let isAudio = mov.mediaKind === 'audio' || (mov.videoUrl && (mov.videoUrl.includes('.mp3') || mov.videoUrl.includes('.m4a') || mov.videoUrl.includes('.wav') || mov.videoUrl.includes('.ogg')));
+            let isAudio = mov.mediaKind === 'audio';
             let streamUrl = mov.videoUrl;
+            let fallbackUrl = mov.fallbackUrl || mov.videoUrl;
             
             if (isAudio) {
                 return `
                     <div class="relative rounded-xl p-6 bg-gradient-to-r from-gray-900 via-cardBg to-gray-900 border border-borderCol flex flex-col items-center justify-center space-y-4 shadow-inner">
-                        <div class="watermark-badge">MGSML AUDIO</div>
+                        <div class="watermark-badge">MGSML STREAM AUDIO</div>
                         <div class="w-16 h-16 rounded-full bg-cryptoGold/20 border border-cryptoGold flex items-center justify-center text-cryptoGold text-2xl shadow-lg animate-pulse">
                             <i class="fa-solid fa-music"></i>
                         </div>
-                        <audio controls preload="auto" crossorigin="anonymous" class="w-full" onloadedmetadata="this.load()">
-                            <source src="${streamUrl}" type="audio/mp4">
-                            <source src="${streamUrl}" type="audio/mpeg">
+                        <audio controls preload="auto" crossorigin="anonymous" class="w-full">
+                            <source src="${fallbackUrl}" type="audio/mp4">
+                            <source src="${streamUrl}" type="application/x-mpegURL">
                             Your browser does not support the audio element.
                         </audio>
                     </div>
@@ -601,8 +621,12 @@
             } else {
                 return `
                     <div class="relative rounded-xl overflow-hidden border border-borderCol bg-black flex items-center justify-center shadow-lg">
-                        <div class="watermark-badge">MGSML SKY</div>
-                        <video src="${streamUrl}" controls playsinline preload="metadata" crossorigin="anonymous" class="w-full max-h-[450px] object-contain"></video>
+                        <div class="watermark-badge">MGSML STREAM</div>
+                        <video controls playsinline preload="metadata" crossorigin="anonymous" class="w-full max-h-[450px] object-contain">
+                            <source src="${fallbackUrl}" type="video/mp4">
+                            <source src="${streamUrl}" type="application/x-mpegURL">
+                            Your browser does not support the video tag.
+                        </video>
                     </div>
                 `;
             }
@@ -622,7 +646,7 @@
                             <h4 class="text-sm font-black text-gray-100">${escapeHtml(mov.title)}</h4>
                             <span class="text-[11px] font-bold text-cyanNeon"><i class="fa-solid fa-eye mr-1"></i>${mov.views || 10} Views</span>
                         </div>
-                        <p class="text-xs text-gray-300">${escapeHtml(mov.description || "Global Stream")}</p>
+                        <p class="text-xs text-gray-300">${escapeHtml(mov.description || "Stream Library")}</p>
                         ${renderMediaTag(mov)}
                         
                         <div class="flex items-center justify-between pt-2 border-t border-borderCol text-xs font-bold">
@@ -642,7 +666,7 @@
                 `;
             });
 
-            container.innerHTML = html || `<div class="text-center py-12 text-gray-400 text-xs font-bold">No public feed videos found. Upload files via Create tab.</div>`;
+            container.innerHTML = html || `<div class="text-center py-12 text-gray-400 text-xs font-bold">No public stream feed found. Upload via Create tab.</div>`;
         };
 
         window.loadMoviesAndShorts = function(moviesList) {
@@ -661,7 +685,7 @@
 
             moviesList.forEach((mov, index) => {
                 let commentsListHtml = (mov.comments || []).map(c => `<div class="text-[11px] bg-darkBg p-1.5 rounded-lg border border-borderCol text-gray-300 mt-1">${escapeHtml(c)}</div>`).join('');
-                let streamShortsUrl = mov.videoUrl;
+                let streamShortsUrl = mov.fallbackUrl || mov.videoUrl;
 
                 movieHtml += `
                     <article class="glass-panel rounded-2xl p-4 shadow-xl relative border border-borderCol/60 mb-4 space-y-3">
@@ -669,7 +693,7 @@
                             <h4 class="text-sm font-black text-gray-100">${escapeHtml(mov.title)}</h4>
                             <span class="text-[11px] font-bold text-cyanNeon"><i class="fa-solid fa-eye mr-1"></i>${mov.views || 10} Views</span>
                         </div>
-                        <p class="text-xs text-gray-300">${escapeHtml(mov.description || "Global Stream")}</p>
+                        <p class="text-xs text-gray-300">${escapeHtml(mov.description || "Stream Library")}</p>
                         ${renderMediaTag(mov)}
                         <div class="flex items-center justify-between pt-2 border-t border-borderCol text-xs font-bold">
                             <button onclick="likeMovie(${index})" class="flex items-center space-x-1.5 text-neonGreen hover:scale-105 transition"><i class="fa-solid fa-heart"></i> <span id="like-count-mov-${index}">${mov.likes || 0}</span></button>
@@ -688,7 +712,7 @@
 
                 shortsHtml += `
                     <div class="relative bg-black rounded-3xl overflow-hidden border border-borderCol h-[580px] flex flex-col justify-between shadow-2xl mb-4 p-4">
-                        <div class="watermark-badge">MGSML SKY</div>
+                        <div class="watermark-badge">MGSML STREAM</div>
                         <video src="${streamShortsUrl}" controls playsinline preload="metadata" crossorigin="anonymous" loop class="absolute inset-0 w-full h-full object-cover z-0"></video>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/30 pointer-events-none z-10"></div>
                         <div class="relative z-20 flex justify-between items-center text-xs font-bold text-white pt-2">
@@ -703,14 +727,14 @@
         };
 
         window.likeMovie = function(index) {
-            let savedMovies = JSON.parse(localStorage.getItem('mgsml_bunny_movies') || '[]');
+            let savedMovies = JSON.parse(localStorage.getItem('mgsml_stream_movies') || '[]');
             if(savedMovies[index]) {
                 savedMovies[index].likes = (savedMovies[index].likes || 0) + 1;
-                localStorage.setItem('mgsml_bunny_movies', JSON.stringify(savedMovies));
+                localStorage.setItem('mgsml_stream_movies', JSON.stringify(savedMovies));
                 let currentBal = parseInt(localStorage.getItem('mgsml_wallet_bal') || '1250') + 10;
                 localStorage.setItem('mgsml_wallet_bal', currentBal);
                 document.getElementById('userMGSMLBalance').innerText = currentBal;
-                fetchBunnyVideosDynamic();
+                fetchStreamVideosDynamic();
             }
         };
 
@@ -719,15 +743,15 @@
             let input = document.getElementById(inputId);
             let val = input ? input.value.trim() : "";
             if(!val) return;
-            let savedMovies = JSON.parse(localStorage.getItem('mgsml_bunny_movies') || '[]');
+            let savedMovies = JSON.parse(localStorage.getItem('mgsml_stream_movies') || '[]');
             if(savedMovies[index]) {
                 if(!savedMovies[index].comments) savedMovies[index].comments = [];
                 savedMovies[index].comments.push(val);
-                localStorage.setItem('mgsml_bunny_movies', JSON.stringify(savedMovies));
+                localStorage.setItem('mgsml_stream_movies', JSON.stringify(savedMovies));
                 let currentBal = parseInt(localStorage.getItem('mgsml_wallet_bal') || '1250') + 15;
                 localStorage.setItem('mgsml_wallet_bal', currentBal);
                 document.getElementById('userMGSMLBalance').innerText = currentBal;
-                fetchBunnyVideosDynamic();
+                fetchStreamVideosDynamic();
             }
         };
 
@@ -834,54 +858,56 @@
             closeTipsModal();
         };
 
-        async function fetchBunnyVideosDynamic() {
-            let cleanEndpoint = MASTER_BUNNY_CONFIG.endpointUrl.replace(/\/$/, '');
-            let listUrl = `${cleanEndpoint}/${MASTER_BUNNY_CONFIG.storageZone}/`;
+        async function fetchStreamVideosDynamic() {
+            let listUrl = `https://video.bunnycdn.com/library/${MASTER_STREAM_CONFIG.libraryId}/videos`;
 
             try {
                 let response = await fetch(listUrl, {
                     method: 'GET',
                     headers: {
-                        'AccessKey': MASTER_BUNNY_CONFIG.apiKey,
+                        'AccessKey': MASTER_STREAM_CONFIG.apiKey,
                         'Accept': 'application/json'
                     }
                 });
 
                 if (response.ok) {
-                    let files = await response.json();
-                    let cleanCdn = MASTER_BUNNY_CONFIG.cdnUrl.endsWith('/') ? MASTER_BUNNY_CONFIG.cdnUrl : MASTER_BUNNY_CONFIG.cdnUrl + '/';
+                    let data = await response.json();
+                    let videos = data.items || [];
                     
-                    let fetchedMovies = files.map(file => {
-                        let videoUrl = `${cleanCdn}${MASTER_BUNNY_CONFIG.storageZone}/${file.ObjectName}`;
-                        let localSaved = JSON.parse(localStorage.getItem('mgsml_bunny_movies') || '[]').find(m => m.videoUrl === videoUrl);
+                    let fetchedMovies = videos.map(vid => {
+                        let videoUrl = `https://${MASTER_STREAM_CONFIG.cdnHostname}/${vid.guid}/playlist.m3u8`;
+                        let fallbackUrl = `https://${MASTER_STREAM_CONFIG.cdnHostname}/${vid.guid}/play_720p.mp4`;
+                        let localSaved = JSON.parse(localStorage.getItem('mgsml_stream_movies') || '[]').find(m => m.id === vid.guid);
+                        
                         return {
-                            id: file.Id || Date.now(),
-                            title: file.ObjectName.replace(/^\d+_[a-zA-Z0-9]+_/, '').replace(/_/g, ' '),
-                            description: "Global Stream from Bunny.net Cloud",
+                            id: vid.guid,
+                            title: vid.title || "Untitled Stream",
+                            description: "Global Stream from Bunny Library",
                             videoUrl: videoUrl,
-                            mediaKind: file.ObjectName.match(/\.(mp3|m4a|wav|ogg)$/i) ? 'audio' : 'video',
+                            fallbackUrl: fallbackUrl,
+                            mediaKind: (vid.title && vid.title.match(/\.(mp3|m4a|wav|ogg)$/i)) ? 'audio' : 'video',
                             views: localSaved ? localSaved.views : Math.floor(Math.random() * 500) + 15,
                             likes: localSaved ? localSaved.likes : 0,
                             comments: localSaved ? localSaved.comments : []
                         };
                     });
 
-                    localStorage.setItem('mgsml_bunny_movies', JSON.stringify(fetchedMovies));
+                    localStorage.setItem('mgsml_stream_movies', JSON.stringify(fetchedMovies));
                     loadHomeFeedContent(fetchedMovies);
                     loadMoviesAndShorts(fetchedMovies);
                 } else {
-                    let fallbackMovies = JSON.parse(localStorage.getItem('mgsml_bunny_movies') || '[]');
+                    let fallbackMovies = JSON.parse(localStorage.getItem('mgsml_stream_movies') || '[]');
                     loadHomeFeedContent(fallbackMovies);
                     loadMoviesAndShorts(fallbackMovies);
                 }
             } catch (err) {
-                let fallbackMovies = JSON.parse(localStorage.getItem('mgsml_bunny_movies') || '[]');
+                let fallbackMovies = JSON.parse(localStorage.getItem('mgsml_stream_movies') || '[]');
                 loadHomeFeedContent(fallbackMovies);
                 loadMoviesAndShorts(fallbackMovies);
             }
         }
 
-        fetchBunnyVideosDynamic();
+        fetchStreamVideosDynamic();
     </script>
 </body>
 </html>
