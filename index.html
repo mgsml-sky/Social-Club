@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- HLS.js Library for Bunny Stream Playback Support -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -471,7 +473,7 @@
             closeSecretAdminModal();
         };
 
-        // --- BUNNY STREAM UPLOAD ENGINE (TUS / API UPLOAD) ---
+        // --- BUNNY STREAM UPLOAD ENGINE ---
         window.handleBunnyStreamUpload = async function() {
             let title = document.getElementById('directVideoTitle').value.trim();
             let desc = document.getElementById('directVideoDesc').value.trim();
@@ -495,7 +497,6 @@
             statusText.innerText = "Creating video entry in Stream Library...";
 
             try {
-                // Step 1: Create Video Object via Bunny Stream API
                 let createUrl = `https://video.bunnycdn.com/library/${MASTER_STREAM_CONFIG.libraryId}/videos`;
                 let createRes = await fetch(createUrl, {
                     method: 'POST',
@@ -515,7 +516,6 @@
                 progressBar.style.width = "30%";
                 progressPercent.innerText = "30%";
 
-                // Step 2: Upload Binary File to the created video ID
                 let uploadUrl = `https://video.bunnycdn.com/library/${MASTER_STREAM_CONFIG.libraryId}/videos/${videoId}`;
                 let xhr = new XMLHttpRequest();
                 xhr.open('PUT', uploadUrl, true);
@@ -534,7 +534,6 @@
                         statusText.innerText = "Upload Complete!";
                         let isAudio = file.type.startsWith('audio/') || file.name.match(/\.(mp3|m4a|wav|ogg)$/i);
                         
-                        // Bunny Stream Playback Embed / Direct URL
                         let streamEmbedUrl = `https://${MASTER_STREAM_CONFIG.cdnHostname}/${videoId}/playlist.m3u8`;
                         let fallbackMp4Url = `https://${MASTER_STREAM_CONFIG.cdnHostname}/${videoId}/play_720p.mp4`;
 
@@ -598,11 +597,11 @@
             fetchStreamVideosDynamic();
         }
 
-        // --- STREAM MEDIA RENDERER (SMOOTH PLAYBACK) ---
-        function renderMediaTag(mov) {
+        // --- SMART STREAM MEDIA RENDERER (FIXED WITH HLS.JS & FALLBACK) ---
+        function renderMediaTag(mov, uniqueId) {
             let isAudio = mov.mediaKind === 'audio';
-            let streamUrl = mov.videoUrl;
-            let fallbackUrl = mov.fallbackUrl || mov.videoUrl;
+            let streamUrl = mov.videoUrl; // m3u8
+            let fallbackUrl = mov.fallbackUrl || mov.videoUrl; // mp4
             
             if (isAudio) {
                 return `
@@ -619,12 +618,27 @@
                     </div>
                 `;
             } else {
+                // Unique ID দিয়ে ভিডিও এলিমেন্ট তৈরি যাতে Hls.js সঠিকভাবে বাইন্ড করতে পারে
+                let vidId = `video-player-${uniqueId}`;
+                setTimeout(() => {
+                    let videoElement = document.getElementById(vidId);
+                    if (videoElement) {
+                        if (Hls.isSupported() && streamUrl.includes('.m3u8')) {
+                            let hls = new Hls();
+                            hls.loadSource(streamUrl);
+                            hls.attachMedia(videoElement);
+                        } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+                            // Safari native support
+                            videoElement.src = streamUrl;
+                        }
+                    }
+                }, 100);
+
                 return `
                     <div class="relative rounded-xl overflow-hidden border border-borderCol bg-black flex items-center justify-center shadow-lg">
                         <div class="watermark-badge">MGSML STREAM</div>
-                        <video controls playsinline preload="metadata" crossorigin="anonymous" class="w-full max-h-[450px] object-contain">
+                        <video id="${vidId}" controls playsinline preload="metadata" crossorigin="anonymous" class="w-full max-h-[450px] object-contain">
                             <source src="${fallbackUrl}" type="video/mp4">
-                            <source src="${streamUrl}" type="application/x-mpegURL">
                             Your browser does not support the video tag.
                         </video>
                     </div>
@@ -647,7 +661,7 @@
                             <span class="text-[11px] font-bold text-cyanNeon"><i class="fa-solid fa-eye mr-1"></i>${mov.views || 10} Views</span>
                         </div>
                         <p class="text-xs text-gray-300">${escapeHtml(mov.description || "Stream Library")}</p>
-                        ${renderMediaTag(mov)}
+                        ${renderMediaTag(mov, 'feed-' + index)}
                         
                         <div class="flex items-center justify-between pt-2 border-t border-borderCol text-xs font-bold">
                             <button onclick="likeMovie(${index})" class="flex items-center space-x-1.5 text-neonGreen hover:scale-105 transition"><i class="fa-solid fa-heart"></i> <span id="like-count-${index}">${mov.likes || 0}</span></button>
@@ -694,7 +708,7 @@
                             <span class="text-[11px] font-bold text-cyanNeon"><i class="fa-solid fa-eye mr-1"></i>${mov.views || 10} Views</span>
                         </div>
                         <p class="text-xs text-gray-300">${escapeHtml(mov.description || "Stream Library")}</p>
-                        ${renderMediaTag(mov)}
+                        ${renderMediaTag(mov, 'movie-' + index)}
                         <div class="flex items-center justify-between pt-2 border-t border-borderCol text-xs font-bold">
                             <button onclick="likeMovie(${index})" class="flex items-center space-x-1.5 text-neonGreen hover:scale-105 transition"><i class="fa-solid fa-heart"></i> <span id="like-count-mov-${index}">${mov.likes || 0}</span></button>
                             <button onclick="openTipsModal()" class="flex items-center space-x-1.5 text-cryptoGold hover:scale-105 transition"><i class="fa-solid fa-coins"></i> <span>Tips</span></button>
