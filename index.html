@@ -8,8 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- HLS.js Library for Bunny Stream Playback Support -->
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -597,12 +595,13 @@
             fetchStreamVideosDynamic();
         }
 
-        // --- SMART STREAM MEDIA RENDERER (FIXED WITH HLS.JS & FALLBACK) ---
-        function renderMediaTag(mov, uniqueId) {
+        // --- BULLET-PROOF IFRAME MEDIA RENDERER (BUNNY STREAM IFRAME) ---
+        function renderMediaTag(mov) {
             let isAudio = mov.mediaKind === 'audio';
-            let streamUrl = mov.videoUrl; // m3u8
-            let fallbackUrl = mov.fallbackUrl || mov.videoUrl; // mp4
-            
+            let videoId = mov.id;
+            let libraryId = MASTER_STREAM_CONFIG.libraryId;
+            let fallbackUrl = mov.fallbackUrl || mov.videoUrl;
+
             if (isAudio) {
                 return `
                     <div class="relative rounded-xl p-6 bg-gradient-to-r from-gray-900 via-cardBg to-gray-900 border border-borderCol flex flex-col items-center justify-center space-y-4 shadow-inner">
@@ -612,35 +611,16 @@
                         </div>
                         <audio controls preload="auto" crossorigin="anonymous" class="w-full">
                             <source src="${fallbackUrl}" type="audio/mp4">
-                            <source src="${streamUrl}" type="application/x-mpegURL">
                             Your browser does not support the audio element.
                         </audio>
                     </div>
                 `;
             } else {
-                // Unique ID দিয়ে ভিডিও এলিমেন্ট তৈরি যাতে Hls.js সঠিকভাবে বাইন্ড করতে পারে
-                let vidId = `video-player-${uniqueId}`;
-                setTimeout(() => {
-                    let videoElement = document.getElementById(vidId);
-                    if (videoElement) {
-                        if (Hls.isSupported() && streamUrl.includes('.m3u8')) {
-                            let hls = new Hls();
-                            hls.loadSource(streamUrl);
-                            hls.attachMedia(videoElement);
-                        } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
-                            // Safari native support
-                            videoElement.src = streamUrl;
-                        }
-                    }
-                }, 100);
-
+                let embedUrl = `https://iframe.mediadelivery.net/embed/${libraryId}/${videoId}?autoplay=false&loop=false&muted=false&preload=true`;
                 return `
-                    <div class="relative rounded-xl overflow-hidden border border-borderCol bg-black flex items-center justify-center shadow-lg">
+                    <div class="relative rounded-xl overflow-hidden border border-borderCol bg-black shadow-lg" style="position: relative; padding-top: 56.25%;">
                         <div class="watermark-badge">MGSML STREAM</div>
-                        <video id="${vidId}" controls playsinline preload="metadata" crossorigin="anonymous" class="w-full max-h-[450px] object-contain">
-                            <source src="${fallbackUrl}" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
+                        <iframe src="${embedUrl}" loading="lazy" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;" allowfullscreen="true"></iframe>
                     </div>
                 `;
             }
@@ -661,7 +641,7 @@
                             <span class="text-[11px] font-bold text-cyanNeon"><i class="fa-solid fa-eye mr-1"></i>${mov.views || 10} Views</span>
                         </div>
                         <p class="text-xs text-gray-300">${escapeHtml(mov.description || "Stream Library")}</p>
-                        ${renderMediaTag(mov, 'feed-' + index)}
+                        ${renderMediaTag(mov)}
                         
                         <div class="flex items-center justify-between pt-2 border-t border-borderCol text-xs font-bold">
                             <button onclick="likeMovie(${index})" class="flex items-center space-x-1.5 text-neonGreen hover:scale-105 transition"><i class="fa-solid fa-heart"></i> <span id="like-count-${index}">${mov.likes || 0}</span></button>
@@ -708,7 +688,7 @@
                             <span class="text-[11px] font-bold text-cyanNeon"><i class="fa-solid fa-eye mr-1"></i>${mov.views || 10} Views</span>
                         </div>
                         <p class="text-xs text-gray-300">${escapeHtml(mov.description || "Stream Library")}</p>
-                        ${renderMediaTag(mov, 'movie-' + index)}
+                        ${renderMediaTag(mov)}
                         <div class="flex items-center justify-between pt-2 border-t border-borderCol text-xs font-bold">
                             <button onclick="likeMovie(${index})" class="flex items-center space-x-1.5 text-neonGreen hover:scale-105 transition"><i class="fa-solid fa-heart"></i> <span id="like-count-mov-${index}">${mov.likes || 0}</span></button>
                             <button onclick="openTipsModal()" class="flex items-center space-x-1.5 text-cryptoGold hover:scale-105 transition"><i class="fa-solid fa-coins"></i> <span>Tips</span></button>
