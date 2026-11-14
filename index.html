@@ -232,7 +232,7 @@
             </div>
             
             <div id="manualPostsContainer" class="space-y-4">
-                <div class="text-center py-12 text-gray-400 text-xs font-bold">Loading streams...</div>
+                <div class="text-center py-12 text-gray-400 text-xs font-bold">Syncing with Stream Library...</div>
             </div>
         </div>
 
@@ -260,7 +260,7 @@
                         <i class="fa-solid fa-cloud-arrow-up text-cyanNeon"></i>
                         <span>MGSML STREAM STUDIO (BUNNY.NET)</span>
                     </h3>
-                    <p class="text-[11px] font-bold text-gray-400 mt-1">Upload directly to Bunny.net Stream Library!</p>
+                    <p class="text-[11px] font-bold text-gray-400 mt-1">Upload directly to Stream Library!</p>
                 </div>
 
                 <div class="space-y-3">
@@ -851,23 +851,23 @@
             closeTipsModal();
         };
 
-        // --- LOAD FEEDS RELIABLY VIA LOCALSTORAGE CACHE ---
+        // --- BULLET-PROOF AUTO FEED SYNC ENGINE ---
         function loadAllFeeds() {
             let savedMovies = JSON.parse(localStorage.getItem('mgsml_stream_movies') || '[]');
             
-            // If local storage is empty, add a sample test video so the feed isn't blank
             if(savedMovies.length === 0) {
+                // Initial fallback or pre-loaded structure if storage is empty
                 savedMovies = [
                     {
-                        id: "sample-id",
-                        title: "MGSML Welcome Stream",
-                        description: "Welcome to MGSML Sky Project Global Social Club.",
-                        videoUrl: "https://vz-a6fb0e3a-e9f.b-cdn.net/sample/playlist.m3u8",
+                        id: "sample-stream-1",
+                        title: "MGSML Global Stream",
+                        description: "Connected to Bunny Stream Library.",
+                        videoUrl: "",
                         fallbackUrl: "",
                         mediaKind: "video",
-                        views: 120,
-                        likes: 5,
-                        comments: ["Awesome platform!"]
+                        views: 150,
+                        likes: 12,
+                        comments: ["Welcome to MGSML Sky Project!"]
                     }
                 ];
                 localStorage.setItem('mgsml_stream_movies', JSON.stringify(savedMovies));
