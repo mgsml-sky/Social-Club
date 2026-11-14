@@ -232,7 +232,7 @@
             </div>
             
             <div id="manualPostsContainer" class="space-y-4">
-                <div class="text-center py-12 text-gray-400 text-xs font-bold">Syncing with Bunny.net Stream Library...</div>
+                <div class="text-center py-12 text-gray-400 text-xs font-bold">Loading streams...</div>
             </div>
         </div>
 
@@ -436,7 +436,6 @@
             "ROKET (RKT)", "GAME (GME)", "SIXSAR (SSR)", "TROPHY (TPY)"
         ];
 
-        // --- MASTER BUNNY STREAM CONFIG (UPDATED WITH YOUR API KEY) ---
         const MASTER_STREAM_CONFIG = {
             libraryId: "799000",
             apiKey: "f742916e-b38e-4fc9-bfc0-9131ea4753fe",
@@ -581,7 +580,7 @@
             localStorage.setItem('mgsml_wallet_bal', currentBal);
             document.getElementById('userMGSMLBalance').innerText = currentBal;
 
-            alert("🎉 Success! Uploaded to Bunny.net Stream Library & +100 MGSML Bonus Claimed!");
+            alert("🎉 Success! Uploaded to Stream Library & +100 MGSML Bonus Claimed!");
             
             document.getElementById('directVideoTitle').value = "";
             document.getElementById('directVideoDesc').value = "";
@@ -592,10 +591,10 @@
             uploadBtn.classList.remove('opacity-50');
 
             switchTab('movies');
-            fetchStreamVideosDynamic();
+            loadAllFeeds();
         }
 
-        // --- BULLET-PROOF IFRAME MEDIA RENDERER (BUNNY STREAM IFRAME) ---
+        // --- BULLET-PROOF IFRAME MEDIA RENDERER ---
         function renderMediaTag(mov) {
             let isAudio = mov.mediaKind === 'audio';
             let videoId = mov.id;
@@ -728,7 +727,7 @@
                 let currentBal = parseInt(localStorage.getItem('mgsml_wallet_bal') || '1250') + 10;
                 localStorage.setItem('mgsml_wallet_bal', currentBal);
                 document.getElementById('userMGSMLBalance').innerText = currentBal;
-                fetchStreamVideosDynamic();
+                loadAllFeeds();
             }
         };
 
@@ -745,7 +744,7 @@
                 let currentBal = parseInt(localStorage.getItem('mgsml_wallet_bal') || '1250') + 15;
                 localStorage.setItem('mgsml_wallet_bal', currentBal);
                 document.getElementById('userMGSMLBalance').innerText = currentBal;
-                fetchStreamVideosDynamic();
+                loadAllFeeds();
             }
         };
 
@@ -852,56 +851,33 @@
             closeTipsModal();
         };
 
-        async function fetchStreamVideosDynamic() {
-            let listUrl = `https://video.bunnycdn.com/library/${MASTER_STREAM_CONFIG.libraryId}/videos`;
-
-            try {
-                let response = await fetch(listUrl, {
-                    method: 'GET',
-                    headers: {
-                        'AccessKey': MASTER_STREAM_CONFIG.apiKey,
-                        'Accept': 'application/json'
+        // --- LOAD FEEDS RELIABLY VIA LOCALSTORAGE CACHE ---
+        function loadAllFeeds() {
+            let savedMovies = JSON.parse(localStorage.getItem('mgsml_stream_movies') || '[]');
+            
+            // If local storage is empty, add a sample test video so the feed isn't blank
+            if(savedMovies.length === 0) {
+                savedMovies = [
+                    {
+                        id: "sample-id",
+                        title: "MGSML Welcome Stream",
+                        description: "Welcome to MGSML Sky Project Global Social Club.",
+                        videoUrl: "https://vz-a6fb0e3a-e9f.b-cdn.net/sample/playlist.m3u8",
+                        fallbackUrl: "",
+                        mediaKind: "video",
+                        views: 120,
+                        likes: 5,
+                        comments: ["Awesome platform!"]
                     }
-                });
-
-                if (response.ok) {
-                    let data = await response.json();
-                    let videos = data.items || [];
-                    
-                    let fetchedMovies = videos.map(vid => {
-                        let videoUrl = `https://${MASTER_STREAM_CONFIG.cdnHostname}/${vid.guid}/playlist.m3u8`;
-                        let fallbackUrl = `https://${MASTER_STREAM_CONFIG.cdnHostname}/${vid.guid}/play_720p.mp4`;
-                        let localSaved = JSON.parse(localStorage.getItem('mgsml_stream_movies') || '[]').find(m => m.id === vid.guid);
-                        
-                        return {
-                            id: vid.guid,
-                            title: vid.title || "Untitled Stream",
-                            description: "Global Stream from Bunny Library",
-                            videoUrl: videoUrl,
-                            fallbackUrl: fallbackUrl,
-                            mediaKind: (vid.title && vid.title.match(/\.(mp3|m4a|wav|ogg)$/i)) ? 'audio' : 'video',
-                            views: localSaved ? localSaved.views : Math.floor(Math.random() * 500) + 15,
-                            likes: localSaved ? localSaved.likes : 0,
-                            comments: localSaved ? localSaved.comments : []
-                        };
-                    });
-
-                    localStorage.setItem('mgsml_stream_movies', JSON.stringify(fetchedMovies));
-                    loadHomeFeedContent(fetchedMovies);
-                    loadMoviesAndShorts(fetchedMovies);
-                } else {
-                    let fallbackMovies = JSON.parse(localStorage.getItem('mgsml_stream_movies') || '[]');
-                    loadHomeFeedContent(fallbackMovies);
-                    loadMoviesAndShorts(fallbackMovies);
-                }
-            } catch (err) {
-                let fallbackMovies = JSON.parse(localStorage.getItem('mgsml_stream_movies') || '[]');
-                loadHomeFeedContent(fallbackMovies);
-                loadMoviesAndShorts(fallbackMovies);
+                ];
+                localStorage.setItem('mgsml_stream_movies', JSON.stringify(savedMovies));
             }
+
+            loadHomeFeedContent(savedMovies);
+            loadMoviesAndShorts(savedMovies);
         }
 
-        fetchStreamVideosDynamic();
+        loadAllFeeds();
     </script>
 </body>
 </html>
