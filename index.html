@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,8 +13,8 @@
             theme: {
                 extend: {
                     colors: {
-                        darkBg: '#080c14',
-                        cardBg: '#111827',
+                        darkBg: '#020813',
+                        cardBg: '#09152b',
                         borderCol: '#1f293d',
                         neonGreen: '#10b981',
                         cryptoGold: '#f59e0b',
@@ -26,28 +26,40 @@
         }
     </script>
     <style>
-        body {
-            background-color: #080c14;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            width: 100%;
+            min-height: 100%;
+            background-color: #020813;
             color: #f8fafc;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow-x: hidden;
         }
+
         .glass-panel {
-            background: rgba(17, 24, 39, 0.95);
-            backdrop-filter: blur(14px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(9, 21, 43, 0.92);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 212, 255, 0.15);
         }
+
         ::-webkit-scrollbar { width: 0px; }
+
         video, audio {
             transition: transform 0.3s ease;
             object-fit: contain;
             background: #000;
         }
+
         .watermark-badge {
             position: absolute;
             top: 8px;
             left: 8px;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(6px);
             border: 1px solid rgba(255, 255, 255, 0.25);
             color: #f59e0b;
@@ -59,12 +71,75 @@
             z-index: 25;
             pointer-events: none;
         }
+
+        /* Top Admin Bar with Green Light Indicator on Right */
+        .top-admin-bar {
+            position: fixed;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 78%;
+            max-width: 290px;
+            height: 32px;
+            background: rgba(2, 18, 44, 0.85);
+            border: 1px solid #00d4ff;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            z-index: 999999;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 12px rgba(0, 212, 255, 0.35);
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .top-admin-bar span {
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 0 6px #00d4ff;
+        }
+
+        .green-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #00ff66;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #00ff66, 0 0 15px #00ff66;
+            animation: greenPulse 1.5s infinite ease-in-out;
+        }
+
+        @keyframes greenPulse {
+            0%, 100% { opacity: 0.6; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 12px #00ff66, 0 0 22px #00ff66; }
+        }
+
+        .top-admin-bar.red-flash {
+            background: rgba(255, 0, 68, 0.45) !important;
+            border-color: #ff0044 !important;
+            box-shadow: 0 0 22px #ff0000 !important;
+        }
+
+        .top-admin-bar.red-flash .green-dot {
+            background-color: #ff0044 !important;
+            box-shadow: 0 0 15px #ff0000, 0 0 25px #ff0000 !important;
+        }
     </style>
 </head>
-<body class="pb-24">
+<body class="pb-28">
 
-    <!-- Top Header Bar -->
-    <header id="mainHeaderBar" class="sticky top-0 z-40 glass-panel border-b border-borderCol px-4 py-3 flex items-center justify-between shadow-xl">
+    <!-- Top Admin Bar with Green Light Indicator on Right -->
+    <div class="top-admin-bar" id="adminBar">
+        <span>MGSML SKY PROJECT</span>
+        <div class="green-dot" id="greenDotBtn"></div>
+    </div>
+
+    <!-- Main Header Bar -->
+    <header id="mainHeaderBar" class="sticky top-0 z-30 glass-panel border-b border-borderCol px-4 py-3 flex items-center justify-between shadow-xl mt-12">
         <div class="flex items-center space-x-3">
             <button onclick="openLeftDrawer()" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cardBg to-borderCol border border-neonGreen/40 flex items-center justify-center text-neonGreen text-lg active:scale-95 transition-all shadow-md">
                 <i class="fa-solid fa-bars"></i>
@@ -106,7 +181,7 @@
                     </button>
                 </div>
 
-                <div class="space-y-2.5 text-xs font-bold" id="drawerNavButtons">
+                <div class="space-y-2.5 text-xs font-bold">
                     <button onclick="switchTab('feed'); closeLeftDrawer();" class="w-full text-left px-3.5 py-3 rounded-xl bg-cardBg border border-borderCol text-gray-200 hover:border-neonGreen flex items-center space-x-3">
                         <i class="fa-solid fa-house text-neonGreen text-sm"></i>
                         <span>HOME FEED</span>
@@ -137,56 +212,57 @@
                     </button>
                 </div>
             </div>
-
-            <!-- Secret Admin Trigger Area -->
-            <div class="pt-4 relative h-10 mt-6">
-                <input type="password" id="secretAdminInput" onkeydown="checkSecretAdminPassword(event)" style="position: absolute; opacity: 0; left: 0; top: 0; width: 100%; height: 100%; z-index: 99; cursor: pointer;" placeholder="">
-            </div>
         </div>
         <div class="flex-1" onclick="closeLeftDrawer()"></div>
     </div>
 
-    <!-- Secret Master Admin Panel -->
-    <div id="secretAdminModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[1000] hidden flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-xl rounded-3xl p-6 border border-red-500/40 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+    <!-- Secret Admin Gateway Modal (M-Pin & GitHub URL Config) -->
+    <div id="adminModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[1000] hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md rounded-3xl p-6 border border-red-500/50 shadow-2xl space-y-5">
             <div class="flex items-center justify-between border-b border-borderCol pb-3">
-                <h3 class="text-sm font-black text-white flex items-center space-x-2">
-                    <i class="fa-solid fa-shield-halved text-red-500"></i>
-                    <span>MGSML MASTER ADMIN & CONFIG</span>
+                <h3 class="text-sm font-black text-red-500 flex items-center space-x-2">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>MGSML ADMIN GATEWAY</span>
                 </h3>
-                <button onclick="closeSecretAdminModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeAdminPanel()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
-            <div class="space-y-6 text-xs font-semibold">
-                <div class="bg-cardBg p-4 rounded-2xl border border-red-500/40 space-y-3">
-                    <h4 class="font-extrabold text-red-400">1. CHANGE ADMIN PASSWORD</h4>
-                    <div class="space-y-2">
-                        <div>
-                            <label class="block font-bold text-gray-300 mb-1">New Password</label>
-                            <input type="password" id="newAdminPass" placeholder="Enter new password" class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-white">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-gray-300 mb-1">Confirm New Password</label>
-                            <input type="password" id="confirmAdminPass" placeholder="Confirm new password" class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-white">
-                        </div>
-                    </div>
-                    <button onclick="saveNewAdminPassword()" class="py-2 px-4 bg-red-600 text-white font-black rounded-xl text-xs">UPDATE PASSWORD</button>
+            <!-- Login Step -->
+            <div id="loginStep" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 mb-1">Enter Admin M-Pin</label>
+                    <input type="password" id="mpinInput" placeholder="Default: 1234" class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-white text-center text-sm font-bold">
                 </div>
-
-                <div class="bg-cardBg p-4 rounded-2xl border border-cryptoGold/40 space-y-3">
-                    <h4 class="font-extrabold text-cryptoGold">2. TIPS COINS MANAGER (ALL 19 TOKENS)</h4>
-                    <div id="adminTipsCoinsCheckboxes" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1"></div>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="verifyMpin()" class="py-2.5 bg-red-600 text-white font-black rounded-xl text-xs shadow-lg">UNLOCK</button>
+                    <button onclick="closeAdminPanel()" class="py-2.5 bg-cardBg border border-borderCol text-gray-300 font-bold rounded-xl text-xs">CANCEL</button>
                 </div>
+            </div>
 
-                <button onclick="saveAdminMasterConfig()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 text-white font-black shadow-xl">
-                    SAVE & SYNC MASTER CONFIGURATION 🚀
-                </button>
+            <!-- Settings Step -->
+            <div id="settingsStep" class="space-y-4" style="display:none;">
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 mb-1">GitHub Page URL (Redirection Link)</label>
+                    <input type="text" id="githubLinkInput" placeholder="https://username.github.io/project" class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-white text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 mb-1">New M-Pin (Optional)</label>
+                    <input type="password" id="newMpinInput" placeholder="Enter new M-Pin" class="w-full bg-darkBg border border-borderCol rounded-xl px-3 py-2 text-white text-xs">
+                </div>
+                <div class="space-y-2">
+                    <h4 class="text-xs font-extrabold text-cryptoGold">Tips Tokens Manager (All 19 Tokens)</h4>
+                    <div id="adminTipsCoinsCheckboxes" class="grid grid-cols-2 gap-2 max-h-36 overflow-y-auto pr-1"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 pt-2">
+                    <button onclick="saveAdminSettings()" class="py-2.5 bg-cyanNeon text-darkBg font-black rounded-xl text-xs shadow-lg">SAVE SETTINGS</button>
+                    <button onclick="closeAdminPanel()" class="py-2.5 bg-cardBg border border-borderCol text-gray-300 font-bold rounded-xl text-xs">CLOSE</button>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Navigation Tabs -->
-    <nav id="topNavTabs" class="flex space-x-2 px-4 py-3 overflow-x-auto bg-darkBg/90 sticky top-[61px] z-30 border-b border-borderCol/60">
+    <nav id="topNavTabs" class="flex space-x-2 px-4 py-3 overflow-x-auto bg-darkBg/95 sticky top-[61px] z-20 border-b border-borderCol/60">
         <button onclick="switchTab('feed')" id="btn-feed" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-extrabold whitespace-nowrap bg-neonGreen text-darkBg shadow-lg shadow-neonGreen/20">
             <i class="fa-solid fa-globe mr-1.5"></i> FEED
         </button>
@@ -232,7 +308,7 @@
             </div>
             
             <div id="manualPostsContainer" class="space-y-4">
-                <div class="text-center py-12 text-gray-400 text-xs font-bold">Syncing with Stream Library...</div>
+                <div class="text-center py-12 text-gray-400 text-xs font-bold">Loading stream library feed...</div>
             </div>
         </div>
 
@@ -442,6 +518,70 @@
             cdnHostname: "vz-a6fb0e3a-e9f.b-cdn.net"
         };
 
+        // --- ADMIN PANEL GATEWAY LOGIC ---
+        const adminBar = document.getElementById('adminBar');
+        const greenDot = document.getElementById('greenDotBtn');
+
+        function openAdminPanel(e) {
+            if(e) e.stopPropagation();
+            adminBar.classList.add('red-flash');
+            
+            setTimeout(() => {
+                adminBar.classList.remove('red-flash');
+                document.getElementById('adminModal').style.display = 'flex';
+                document.getElementById('loginStep').style.display = 'block';
+                document.getElementById('settingsStep').style.display = 'none';
+                document.getElementById('mpinInput').value = '';
+                renderAdminTipsCheckboxes();
+            }, 350);
+        }
+
+        adminBar.onclick = openAdminPanel;
+        adminBar.ontouchstart = openAdminPanel;
+        greenDot.onclick = openAdminPanel;
+        greenDot.ontouchstart = openAdminPanel;
+
+        function closeAdminPanel() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
+        function verifyMpin() {
+            const currentMpin = localStorage.getItem('adminMpin') || '1234';
+            const enteredMpin = document.getElementById('mpinInput').value;
+
+            if (enteredMpin === currentMpin) {
+                document.getElementById('loginStep').style.display = 'none';
+                document.getElementById('settingsStep').style.display = 'block';
+                document.getElementById('githubLinkInput').value = localStorage.getItem('targetUrl') || '';
+                document.getElementById('newMpinInput').value = '';
+            } else {
+                alert("Incorrect M-Pin! (Default is 1234)");
+            }
+        }
+
+        function saveAdminSettings() {
+            const newUrl = document.getElementById('githubLinkInput').value;
+            const newMpin = document.getElementById('newMpinInput').value;
+
+            if (newUrl) {
+                localStorage.setItem('targetUrl', newUrl.trim());
+            }
+            if (newMpin) {
+                localStorage.setItem('adminMpin', newMpin.trim());
+                alert("M-Pin & Settings Updated Successfully!");
+            } else {
+                alert("Settings Saved Successfully!");
+            }
+            
+            // Save Tips Checkboxes
+            let checkedArr = tokenList.map((_, index) => {
+                let chk = document.getElementById(`tip-chk-${index}`);
+                return chk ? chk.checked : true;
+            });
+            localStorage.setItem('mgsml_checked_tips', JSON.stringify(checkedArr));
+            closeAdminPanel();
+        }
+
         function renderAdminTipsCheckboxes() {
             const container = document.getElementById('adminTipsCoinsCheckboxes');
             if(!container) return;
@@ -458,17 +598,6 @@
                 container.appendChild(div);
             });
         }
-        renderAdminTipsCheckboxes();
-
-        window.saveAdminMasterConfig = function() {
-            let checkedArr = tokenList.map((_, index) => {
-                let chk = document.getElementById(`tip-chk-${index}`);
-                return chk ? chk.checked : true;
-            });
-            localStorage.setItem('mgsml_checked_tips', JSON.stringify(checkedArr));
-            alert("✨ Master configuration saved and synced successfully!");
-            closeSecretAdminModal();
-        };
 
         // --- BUNNY STREAM UPLOAD ENGINE ---
         window.handleBunnyStreamUpload = async function() {
@@ -774,31 +903,6 @@
         window.openLeftDrawer = function() { document.getElementById('leftDrawer').classList.remove('hidden'); };
         window.closeLeftDrawer = function() { document.getElementById('leftDrawer').classList.add('hidden'); };
 
-        window.checkSecretAdminPassword = function(event) {
-            if (event.key === 'Enter') {
-                let inputVal = document.getElementById('secretAdminInput').value;
-                let currentPass = localStorage.getItem('mgsml_admin_pass') || "1234";
-                if (inputVal === currentPass) {
-                    document.getElementById('secretAdminInput').value = '';
-                    closeLeftDrawer();
-                    document.getElementById('secretAdminModal').classList.remove('hidden');
-                } else {
-                    alert("Incorrect Password!");
-                    document.getElementById('secretAdminInput').value = '';
-                }
-            }
-        };
-
-        window.closeSecretAdminModal = function() { document.getElementById('secretAdminModal').classList.add('hidden'); };
-
-        window.saveNewAdminPassword = function() {
-            let p1 = document.getElementById('newAdminPass').value;
-            let p2 = document.getElementById('confirmAdminPass').value;
-            if(!p1 || p1 !== p2) { alert("Passwords do not match or empty!"); return; }
-            localStorage.setItem('mgsml_admin_pass', p1);
-            alert("✨ Admin password updated successfully!");
-        };
-
         window.switchTab = function(tabName) {
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.className = "tab-btn px-4 py-2.5 rounded-xl text-sm font-extrabold whitespace-nowrap bg-cardBg text-gray-400 border border-borderCol";
@@ -812,15 +916,18 @@
             if(activeSection) activeSection.classList.remove('hidden');
 
             const mainHeader = document.getElementById('mainHeaderBar');
+            const topAdminBar = document.getElementById('adminBar');
             const topNav = document.getElementById('topNavTabs');
             const bottomNav = document.getElementById('bottomNavBar');
 
             if (tabName === 'live' || tabName === 'profile') {
                 if(mainHeader) mainHeader.classList.add('hidden');
+                if(topAdminBar) topAdminBar.classList.add('hidden');
                 if(topNav) topNav.classList.add('hidden');
                 if(bottomNav) bottomNav.classList.add('hidden');
             } else {
                 if(mainHeader) mainHeader.classList.remove('hidden');
+                if(topAdminBar) topAdminBar.classList.remove('hidden');
                 if(topNav) topNav.classList.remove('hidden');
                 if(bottomNav) bottomNav.classList.remove('hidden');
             }
@@ -851,12 +958,11 @@
             closeTipsModal();
         };
 
-        // --- BULLET-PROOF AUTO FEED SYNC ENGINE ---
+        // --- RELIABLE AUTO FEED SYNC ENGINE ---
         function loadAllFeeds() {
             let savedMovies = JSON.parse(localStorage.getItem('mgsml_stream_movies') || '[]');
             
             if(savedMovies.length === 0) {
-                // Initial fallback or pre-loaded structure if storage is empty
                 savedMovies = [
                     {
                         id: "sample-stream-1",
