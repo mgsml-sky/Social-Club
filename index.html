@@ -26,12 +26,7 @@
         }
     </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body, html {
             width: 100%;
             min-height: 100%;
@@ -40,21 +35,17 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow-x: hidden;
         }
-
         .glass-panel {
             background: rgba(9, 21, 43, 0.92);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(0, 212, 255, 0.15);
         }
-
         ::-webkit-scrollbar { width: 0px; }
-
         video, audio {
             transition: transform 0.3s ease;
             object-fit: contain;
             background: #000;
         }
-
         .watermark-badge {
             position: absolute;
             top: 8px;
@@ -71,8 +62,6 @@
             z-index: 25;
             pointer-events: none;
         }
-
-        /* Top Admin Bar with Green Light Indicator on Right */
         .top-admin-bar {
             position: fixed;
             top: 12px;
@@ -95,7 +84,6 @@
             -webkit-tap-highlight-color: transparent;
             transition: all 0.3s ease;
         }
-
         .top-admin-bar span {
             color: #ffffff;
             font-size: 11px;
@@ -103,7 +91,6 @@
             letter-spacing: 1px;
             text-shadow: 0 0 6px #00d4ff;
         }
-
         .green-dot {
             width: 10px;
             height: 10px;
@@ -112,18 +99,15 @@
             box-shadow: 0 0 8px #00ff66, 0 0 15px #00ff66;
             animation: greenPulse 1.5s infinite ease-in-out;
         }
-
         @keyframes greenPulse {
             0%, 100% { opacity: 0.6; transform: scale(0.9); }
             50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 12px #00ff66, 0 0 22px #00ff66; }
         }
-
         .top-admin-bar.red-flash {
             background: rgba(255, 0, 68, 0.45) !important;
             border-color: #ff0044 !important;
             box-shadow: 0 0 22px #ff0000 !important;
         }
-
         .top-admin-bar.red-flash .green-dot {
             background-color: #ff0044 !important;
             box-shadow: 0 0 15px #ff0000, 0 0 25px #ff0000 !important;
@@ -514,7 +498,7 @@
 
         const MASTER_STREAM_CONFIG = {
             libraryId: "799000",
-            apiKey: "f742916e-b38e-4fc9-bfc0-9131ea4753fe",
+            apiKey: "5b0c175e-28c9-44aa-9f6b54e37ab4-a956-4bdd",
             cdnHostname: "vz-a6fb0e3a-e9f.b-cdn.net"
         };
 
@@ -573,7 +557,6 @@
                 alert("Settings Saved Successfully!");
             }
             
-            // Save Tips Checkboxes
             let checkedArr = tokenList.map((_, index) => {
                 let chk = document.getElementById(`tip-chk-${index}`);
                 return chk ? chk.checked : true;
